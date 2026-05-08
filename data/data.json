@@ -369,11 +369,15 @@
     {
       "id": 12,
       "date": "2026-05-08",
-      "game": "Test2",
+      "game": "Test3",
       "placements": [
         {
           "playerId": "walton",
           "place": 1
+        },
+        {
+          "playerId": "jack",
+          "place": 2
         }
       ],
       "guests": []
