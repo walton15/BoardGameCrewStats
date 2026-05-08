@@ -346,7 +346,7 @@ function renderSessions(sessions, players) {
             <div class="session-game">🎲 ${s.game}</div>
             <div class="session-date">${dateStr}</div>
           </div>
-          <a href="admin.html?edit=${s.id}" class="btn-edit-session">Edit</a>
+          <a href="session.html?edit=${s.id}" class="btn-edit-session">Edit</a>
         </div>
         <table class="session-table"><tbody>${rows}</tbody></table>
       </div>
