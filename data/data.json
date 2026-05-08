@@ -99,7 +99,7 @@
         },
         {
           "playerId": "jack",
-          "place":2
+          "place": 2
         },
         {
           "playerId": "autumn",
@@ -122,24 +122,20 @@
       "game": "Werewolf",
       "placements": [
         {
-          "playerId": "maddy",
-          "place": 5
-        },
-        {
-          "playerId": "jack",
-          "place":2
+          "playerId": "taylor",
+          "place": 2
         },
         {
           "playerId": "autumn",
           "place": 1
         },
         {
-          "playerId": "taylor",
+          "playerId": "jack",
           "place": 2
         },
         {
-          "playerId": "walton",
-          "place": 2
+          "playerId": "maddy",
+          "place": 5
         }
       ],
       "guests": []
