@@ -352,9 +352,50 @@ main {
 }
 
 .td-avg    { font-family: 'Cinzel', serif; color: var(--gold); font-weight: 600; }
-.td-worst  { color: #c97070; }
 .td-firsts { color: #6ec99a; font-family: 'Cinzel', serif; }
 .td-lasts  { color: #c97070; font-family: 'Cinzel', serif; }
+
+/* Sortable headers */
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+th.sortable:hover { color: var(--text); }
+th.sortable::after { content: ' ⇅'; opacity: 0.3; font-size: 0.8em; }
+th.sort-asc::after  { content: ' ↑'; opacity: 1; color: var(--gold); }
+th.sort-desc::after { content: ' ↓'; opacity: 1; color: var(--gold); }
+
+/* Podium name+avatar link */
+.podium-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+.podium-link:hover .podium-player-name { color: var(--gold); }
+.podium-link:hover .podium-avatar { box-shadow: 0 0 10px rgba(201,185,122,0.4); }
+
+/* Player name link in rankings */
+.player-photo-link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.player-photo-link:hover { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
+
+/* Chart pan hint */
+.chart-pan-hint {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-style: italic;
+  margin-top: 0.5rem;
+}
 
 /* ==========================================
    CHART
@@ -957,10 +998,8 @@ footer {
 
   .sessions-grid { grid-template-columns: 1fr; }
 
-  .rankings-table th:nth-child(4),
-  .rankings-table td:nth-child(4),
-  .rankings-table th:nth-child(5),
-  .rankings-table td:nth-child(5) { display: none; }
+  .rankings-table th:nth-child(6),
+  .rankings-table td:nth-child(6) { display: none; }
 }
 
 @media (max-width: 380px) {

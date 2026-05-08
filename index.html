@@ -28,7 +28,6 @@
     <a href="#history">History</a>
     <a href="#sessions">Sessions</a>
     <a href="admin.html">+ Add Session</a>
-    <a href="photos.html">📷 Photos</a>
   </nav>
 
   <main>
@@ -50,12 +49,11 @@
           <thead>
             <tr>
               <th>Rank</th>
-              <th>Player</th>
-              <th>Avg</th>
-              <th>Worst</th>
-              <th>Sessions</th>
-              <th>🥇 1sts</th>
-              <th>💀 Lasts</th>
+              <th class="sortable" data-col="player">Player</th>
+              <th class="sortable sort-asc" data-col="avg">Avg</th>
+              <th class="sortable" data-col="firsts">🥇 1sts</th>
+              <th class="sortable" data-col="lasts">💀 Lasts</th>
+              <th class="sortable" data-col="sessions">Sessions</th>
             </tr>
           </thead>
           <tbody id="rankings-body">
@@ -90,7 +88,9 @@
     <p>Board Game Crew Stats &mdash; <a href="admin.html" style="color:var(--muted);text-underline-offset:3px">Admin</a></p>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

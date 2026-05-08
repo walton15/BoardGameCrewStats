@@ -1,3 +1,19 @@
+// ── Sort state ───────────────────────────────────────────────────────────────
+
+let rankingData = [];
+let sortCol = 'avg';
+let sortDir = 'asc';
+
+const SORT_DEFAULTS = {
+  player:   'desc',
+  avg:      'asc',
+  firsts:   'desc',
+  lasts:    'desc',
+  sessions: 'desc',
+};
+
+// ── Data ─────────────────────────────────────────────────────────────────────
+
 async function loadData() {
   const res = await fetch('data/data.json');
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -8,7 +24,7 @@ function calcStats(players, sessions) {
   const ranked = players.map(player => {
     let firstCount = 0;
     let lastCount  = 0;
-    const places = [];
+    const places   = [];
 
     sessions.forEach(s => {
       const found = s.placements.find(p => p.playerId === player.id);
@@ -26,22 +42,15 @@ function calcStats(players, sessions) {
       ? +(places.reduce((a, b) => a + b, 0) / places.length).toFixed(2)
       : null;
 
-    return {
-      ...player,
-      avg,
-      worst:        places.length ? Math.max(...places) : null,
-      sessionCount: places.length,
-      firstCount,
-      lastCount,
-    };
-  });
-
-  return ranked.sort((a, b) => {
+    return { ...player, avg, sessionCount: places.length, firstCount, lastCount };
+  }).sort((a, b) => {
     if (a.avg === null && b.avg === null) return 0;
     if (a.avg === null) return 1;
     if (b.avg === null) return -1;
     return a.avg - b.avg;
   });
+
+  return ranked.map((p, i) => ({ ...p, avgRank: i + 1 }));
 }
 
 function placeIcon(n) {
@@ -51,7 +60,7 @@ function placeIcon(n) {
   return `#${n}`;
 }
 
-// ── Podium ─────────────────────────────────────────────────────────────────
+// ── Podium ────────────────────────────────────────────────────────────────────
 
 function renderPodium(ranked) {
   const el = document.getElementById('podium-container');
@@ -66,18 +75,21 @@ function renderPodium(ranked) {
   order.push(       { p: top[0], rank: 1 });
   if (top[2]) order.push({ p: top[2], rank: 3 });
 
-  const heights = { 1: 140, 2: 100, 3: 75 };
-  const medals  = { 1: '🥇', 2: '🥈', 3: '🥉' };
+  const heights    = { 1: 140, 2: 100, 3: 75 };
+  const medals     = { 1: '🥇', 2: '🥈', 3: '🥉' };
+  const rankColors = { 1: 'var(--rank1)', 2: 'var(--rank2)', 3: 'var(--rank3)' };
 
   el.innerHTML = order.map(({ p, rank }) => `
     <div class="podium-item podium-rank-${rank}">
       <div class="podium-info">
-        <span class="podium-player-name">${p.name}</span>
-        <div class="podium-avatar" style="border-color:${rank === 1 ? 'var(--rank1)' : rank === 2 ? 'var(--rank2)' : 'var(--rank3)'}">
-          ${p.image
-            ? `<img src="${p.image}" alt="${p.name}">`
-            : `<span style="color:${p.color}">${p.name[0]}</span>`}
-        </div>
+        <a href="photos.html?player=${p.id}" class="podium-link" title="Update ${p.name}'s photo">
+          <span class="podium-player-name">${p.name}</span>
+          <div class="podium-avatar" style="border-color:${rankColors[rank]}">
+            ${p.image
+              ? `<img src="${p.image}" alt="${p.name}">`
+              : `<span style="color:${p.color}">${p.name[0]}</span>`}
+          </div>
+        </a>
         <span class="podium-avg">avg&nbsp;${p.avg?.toFixed(2) ?? '—'}</span>
       </div>
       <div class="podium-block" style="height:${heights[rank]}px">
@@ -88,34 +100,77 @@ function renderPodium(ranked) {
   `).join('');
 }
 
-// ── Rankings table ──────────────────────────────────────────────────────────
+// ── Rankings table ────────────────────────────────────────────────────────────
 
-function renderRankings(ranked) {
-  const tbody = document.getElementById('rankings-body');
+function getSortedRankings() {
+  return [...rankingData].sort((a, b) => {
+    let va, vb;
+    switch (sortCol) {
+      case 'player':   va = a.name;         vb = b.name;         break;
+      case 'avg':      va = a.avg ?? 999;   vb = b.avg ?? 999;   break;
+      case 'firsts':   va = a.firstCount;   vb = b.firstCount;   break;
+      case 'lasts':    va = a.lastCount;    vb = b.lastCount;    break;
+      case 'sessions': va = a.sessionCount; vb = b.sessionCount; break;
+      default: return 0;
+    }
+    if (typeof va === 'string') return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+    return sortDir === 'asc' ? va - vb : vb - va;
+  });
+}
+
+function updateSortHeaders() {
+  document.querySelectorAll('th[data-col]').forEach(th => {
+    th.classList.remove('sort-asc', 'sort-desc');
+    if (th.dataset.col === sortCol) {
+      th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+    }
+  });
+}
+
+function renderRankingsBody() {
   const icons = ['🥇', '🥈', '🥉'];
-
-  tbody.innerHTML = ranked.map((p, i) => {
-    const rank = i + 1;
+  document.getElementById('rankings-body').innerHTML = getSortedRankings().map(p => {
+    const rank = p.avgRank;
     return `
       <tr class="rank-row rank-tier-${Math.min(rank, 4)}">
         <td class="td-rank">${rank <= 3 ? icons[rank - 1] : `#${rank}`}</td>
         <td>
           <div class="td-player">
             <span class="player-dot" style="background:${p.color}"></span>
-            ${p.name}
+            <a href="photos.html?player=${p.id}" class="player-photo-link">${p.name}</a>
           </div>
         </td>
         <td class="td-avg">${p.avg?.toFixed(2) ?? '—'}</td>
-        <td class="td-worst">${p.worst !== null ? `#${p.worst}` : '—'}</td>
-        <td>${p.sessionCount}</td>
         <td class="td-firsts">${p.firstCount}</td>
         <td class="td-lasts">${p.lastCount}</td>
+        <td>${p.sessionCount}</td>
       </tr>
     `;
   }).join('');
 }
 
-// ── Chart ───────────────────────────────────────────────────────────────────
+function renderRankings(ranked) {
+  rankingData = ranked;
+
+  document.querySelectorAll('th[data-col]').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.col;
+      sortDir = sortCol === col
+        ? (sortDir === 'asc' ? 'desc' : 'asc')
+        : SORT_DEFAULTS[col];
+      sortCol = col;
+      updateSortHeaders();
+      renderRankingsBody();
+    });
+  });
+
+  updateSortHeaders();
+  renderRankingsBody();
+}
+
+// ── Chart ─────────────────────────────────────────────────────────────────────
+
+const VISIBLE_POINTS = 6;
 
 function renderChart(ranked, sessions) {
   const el = document.getElementById('placementChart');
@@ -148,6 +203,9 @@ function renderChart(ranked, sessions) {
     spanGaps: false,
   }));
 
+  const canPan  = sorted.length > VISIBLE_POINTS;
+  const initMin = canPan ? labels[sorted.length - VISIBLE_POINTS] : undefined;
+
   new Chart(el.getContext('2d'), {
     type: 'line',
     data: { labels, datasets },
@@ -159,27 +217,19 @@ function renderChart(ranked, sessions) {
         y: {
           reverse: true,
           min: 1,
-          ticks: {
-            stepSize: 1,
-            callback: v => `#${v}`,
-            color: '#c9b97a',
-            font: { size: 13 },
-          },
+          ticks: { stepSize: 1, callback: v => `#${v}`, color: '#c9b97a', font: { size: 13 } },
           grid: { color: 'rgba(201,185,122,0.12)' },
           title: { display: true, text: 'Placement', color: '#c9b97a' },
         },
         x: {
+          min: initMin,
           ticks: { color: '#c9b97a', maxRotation: 40, font: { size: 12 } },
           grid: { color: 'rgba(201,185,122,0.08)' },
         },
       },
       plugins: {
         legend: {
-          labels: {
-            color: '#f0e6d3',
-            font: { size: 13 },
-            usePointStyle: true,
-          },
+          labels: { color: '#f0e6d3', font: { size: 13 }, usePointStyle: true },
         },
         tooltip: {
           backgroundColor: 'rgba(8,18,10,0.94)',
@@ -193,22 +243,33 @@ function renderChart(ranked, sessions) {
               : ` ${ctx.dataset.label}: absent`,
           },
         },
+        zoom: {
+          pan: { enabled: canPan, mode: 'x' },
+          ...(canPan && {
+            limits: { x: { min: 0, max: labels.length - 1, minRange: VISIBLE_POINTS - 1 } },
+          }),
+        },
       },
     },
   });
+
+  if (canPan) {
+    const wrap = el.closest('.chart-wrap');
+    const hint = document.createElement('p');
+    hint.className = 'chart-pan-hint';
+    hint.textContent = '← Drag or swipe to explore all sessions →';
+    wrap.appendChild(hint);
+  }
 }
 
-// ── Sessions ────────────────────────────────────────────────────────────────
+// ── Sessions ──────────────────────────────────────────────────────────────────
 
 function renderSessions(sessions, players) {
   const container = document.getElementById('sessions-container');
   const pMap = Object.fromEntries(players.map(p => [p.id, p]));
   const sorted = [...sessions].sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  if (!sorted.length) {
-    container.innerHTML = '<p class="empty-state">No sessions yet.</p>';
-    return;
-  }
+  if (!sorted.length) { container.innerHTML = '<p class="empty-state">No sessions yet.</p>'; return; }
 
   container.innerHTML = sorted.map(s => {
     const d = new Date(s.date + 'T00:00:00');
@@ -219,16 +280,9 @@ function renderSessions(sessions, players) {
     const participants = [
       ...s.placements.map(p => ({
         name: pMap[p.playerId]?.name ?? p.playerId,
-        place: p.place,
-        color: pMap[p.playerId]?.color ?? '#888',
-        isGuest: false,
+        place: p.place, color: pMap[p.playerId]?.color ?? '#888', isGuest: false,
       })),
-      ...(s.guests || []).map(g => ({
-        name: g.name,
-        place: g.place,
-        color: null,
-        isGuest: true,
-      })),
+      ...(s.guests || []).map(g => ({ name: g.name, place: g.place, color: null, isGuest: true })),
     ].sort((a, b) => a.place - b.place || (a.isGuest ? 1 : -1));
 
     const rows = participants.map(p => `
@@ -254,7 +308,7 @@ function renderSessions(sessions, players) {
   }).join('');
 }
 
-// ── Init ────────────────────────────────────────────────────────────────────
+// ── Init ──────────────────────────────────────────────────────────────────────
 
 async function init() {
   try {

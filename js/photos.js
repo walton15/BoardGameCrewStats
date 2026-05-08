@@ -23,6 +23,9 @@ async function init() {
   await loadData();
   wireUploadArea();
   document.getElementById('btn-upload').addEventListener('click', handleUpload);
+
+  const preselect = new URLSearchParams(window.location.search).get('player');
+  if (preselect) selectPlayer(preselect);
 }
 
 // ── Data loading ──────────────────────────────────────────────────────────────
