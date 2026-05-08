@@ -50,7 +50,12 @@ function calcStats(players, sessions) {
     return a.avg - b.avg;
   });
 
-  return ranked.map((p, i) => ({ ...p, avgRank: i + 1 }));
+  return ranked.map((p, _, arr) => {
+    const rank = p.avg === null
+      ? arr.filter(q => q.avg !== null).length + 1
+      : arr.filter(q => q.avg !== null && q.avg < p.avg).length + 1;
+    return { ...p, avgRank: rank };
+  });
 }
 
 function placeIcon(n) {
