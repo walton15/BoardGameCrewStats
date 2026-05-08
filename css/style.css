@@ -455,20 +455,24 @@ th.sort-desc::after { content: ' ↓'; opacity: 1; color: var(--gold); }
 }
 
 .btn-add-session {
-  font-family: 'Cinzel', serif;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(201,185,122,0.5);
   color: var(--gold);
   text-decoration: none;
-  border: 1px solid rgba(201,185,122,0.4);
-  border-radius: 6px;
-  padding: 0.4rem 0.85rem;
-  white-space: nowrap;
-  transition: background 0.2s;
+  font-size: 1.4rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s;
 }
-.btn-add-session:hover { background: rgba(201,185,122,0.08); }
+.btn-add-session:hover {
+  background: rgba(201,185,122,0.1);
+  border-color: var(--gold);
+}
 
 /* Edit button on session cards */
 .btn-edit-session {
