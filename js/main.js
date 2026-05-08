@@ -180,6 +180,7 @@ function renderChart(ranked, sessions) {
   }
 
   const sorted = [...sessions].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const canPan = sorted.length > VISIBLE_POINTS;
 
   const labels = sorted.map(s => {
     const d = new Date(s.date + 'T00:00:00');
@@ -203,15 +204,16 @@ function renderChart(ranked, sessions) {
     spanGaps: false,
   }));
 
-  const canPan  = sorted.length > VISIBLE_POINTS;
-  const initMin = canPan ? labels[sorted.length - VISIBLE_POINTS] : undefined;
+  let currentMin = canPan ? sorted.length - VISIBLE_POINTS : 0;
+  const maxMin   = labels.length - VISIBLE_POINTS;
 
-  new Chart(el.getContext('2d'), {
+  const chart = new Chart(el.getContext('2d'), {
     type: 'line',
     data: { labels, datasets },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: { duration: 700, easing: 'easeInOutQuart' },
       interaction: { mode: 'index', intersect: false },
       scales: {
         y: {
@@ -222,7 +224,8 @@ function renderChart(ranked, sessions) {
           title: { display: true, text: 'Placement', color: '#c9b97a' },
         },
         x: {
-          min: initMin,
+          min: canPan ? labels[currentMin] : undefined,
+          max: canPan ? labels[currentMin + VISIBLE_POINTS - 1] : undefined,
           ticks: { color: '#c9b97a', maxRotation: 40, font: { size: 12 } },
           grid: { color: 'rgba(201,185,122,0.08)' },
         },
@@ -243,23 +246,91 @@ function renderChart(ranked, sessions) {
               : ` ${ctx.dataset.label}: absent`,
           },
         },
-        zoom: {
-          pan: { enabled: canPan, mode: 'x' },
-          ...(canPan && {
-            limits: { x: { min: 0, max: labels.length - 1, minRange: VISIBLE_POINTS - 1 } },
-          }),
-        },
+        zoom: { pan: { enabled: false } },
       },
     },
   });
 
-  if (canPan) {
-    const wrap = el.closest('.chart-wrap');
-    const hint = document.createElement('p');
-    hint.className = 'chart-pan-hint';
-    hint.textContent = '← Drag or swipe to explore all sessions →';
-    wrap.appendChild(hint);
+  if (!canPan) return;
+
+  const wrap = el.closest('.chart-wrap');
+
+  // Controls row (arrows + hint) placed after the chart wrap
+  const controls = document.createElement('div');
+  controls.className = 'chart-pan-controls';
+  controls.innerHTML = `
+    <button type="button" class="chart-arrow" id="chart-prev" aria-label="Pan to earlier sessions">&#8249;</button>
+    <p class="chart-pan-hint">&#8592; Drag or swipe to explore all sessions &#8594;</p>
+    <button type="button" class="chart-arrow" id="chart-next" aria-label="Pan to later sessions">&#8250;</button>
+  `;
+  wrap.insertAdjacentElement('afterend', controls);
+
+  const prevBtn = controls.querySelector('#chart-prev');
+  const nextBtn = controls.querySelector('#chart-next');
+
+  function updatePanUI() {
+    const atStart = currentMin <= 0;
+    const atEnd   = currentMin >= maxMin;
+    prevBtn.disabled      = atStart;
+    nextBtn.disabled      = atEnd;
+    prevBtn.style.opacity = atStart ? '0.2' : '1';
+    nextBtn.style.opacity = atEnd   ? '0.2' : '1';
   }
+
+  function applyWindow(newMin, animate = false) {
+    currentMin = Math.max(0, Math.min(maxMin, Math.round(newMin)));
+    chart.options.scales.x.min = labels[currentMin];
+    chart.options.scales.x.max = labels[currentMin + VISIBLE_POINTS - 1];
+    chart.update(animate ? undefined : 'none');
+    updatePanUI();
+  }
+
+  prevBtn.addEventListener('click', () => applyWindow(currentMin - 1, true));
+  nextBtn.addEventListener('click', () => applyWindow(currentMin + 1, true));
+
+  // ── Mouse drag ────────────────────────────────────────────────────────────
+  let dragStartX   = null;
+  let dragStartMin = null;
+
+  el.style.cursor = 'grab';
+
+  el.addEventListener('mousedown', e => {
+    if (e.button !== 0) return;
+    dragStartX   = e.clientX;
+    dragStartMin = currentMin;
+    el.style.cursor = 'grabbing';
+    e.preventDefault();
+  });
+
+  el.addEventListener('mousemove', e => {
+    if (dragStartX === null) return;
+    const pixPerLabel = chart.scales.x.width / VISIBLE_POINTS;
+    applyWindow(dragStartMin + (dragStartX - e.clientX) / pixPerLabel);
+  });
+
+  const stopDrag = () => {
+    if (dragStartX === null) return;
+    dragStartX = null;
+    el.style.cursor = 'grab';
+  };
+  el.addEventListener('mouseup',    stopDrag);
+  el.addEventListener('mouseleave', stopDrag);
+
+  // ── Touch swipe (Hammer.js) ───────────────────────────────────────────────
+  if (window.Hammer) {
+    const mc = new Hammer.Manager(el);
+    mc.add(new Hammer.Pan({ direction: Hammer.DIRECTION_HORIZONTAL, threshold: 5 }));
+    let touchStartMin = null;
+    mc.on('panstart', ()  => { touchStartMin = currentMin; });
+    mc.on('panmove',  ev  => {
+      if (touchStartMin === null) return;
+      const pixPerLabel = chart.scales.x.width / VISIBLE_POINTS;
+      applyWindow(touchStartMin - ev.deltaX / pixPerLabel);
+    });
+    mc.on('panend', () => { touchStartMin = null; });
+  }
+
+  updatePanUI();
 }
 
 // ── Sessions ──────────────────────────────────────────────────────────────────

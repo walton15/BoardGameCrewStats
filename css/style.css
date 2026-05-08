@@ -388,13 +388,43 @@ th.sort-desc::after { content: ' ↓'; opacity: 1; color: var(--gold); }
 }
 .player-photo-link:hover { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
 
-/* Chart pan hint */
+/* Chart pan controls */
+.chart-pan-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.chart-arrow {
+  background: rgba(201,185,122,0.08);
+  border: 1px solid rgba(201,185,122,0.25);
+  color: var(--gold);
+  font-size: 1.6rem;
+  line-height: 1;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.25s, background 0.2s;
+  padding: 0;
+  flex-shrink: 0;
+  user-select: none;
+}
+.chart-arrow:not(:disabled):hover { background: rgba(201,185,122,0.22); }
+.chart-arrow:disabled { cursor: default; }
+
 .chart-pan-hint {
   text-align: center;
   font-size: 0.8rem;
   color: var(--muted);
   font-style: italic;
-  margin-top: 0.5rem;
+  margin: 0;
+  flex: 1;
 }
 
 /* ==========================================
