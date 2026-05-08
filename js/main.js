@@ -342,8 +342,11 @@ function renderSessions(sessions, players) {
     return `
       <div class="session-card">
         <div class="session-head">
-          <div class="session-game">🎲 ${s.game}</div>
-          <div class="session-date">${dateStr}</div>
+          <div>
+            <div class="session-game">🎲 ${s.game}</div>
+            <div class="session-date">${dateStr}</div>
+          </div>
+          <a href="admin.html?edit=${s.id}" class="btn-edit-session">Edit</a>
         </div>
         <table class="session-table"><tbody>${rows}</tbody></table>
       </div>

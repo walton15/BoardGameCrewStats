@@ -436,6 +436,58 @@ th.sort-desc::after { content: ' ↓'; opacity: 1; color: var(--gold); }
   .chart-wrap { height: 360px; }
 }
 
+/* Sessions section header row */
+.section-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.35rem;
+}
+
+.section-title-row .section-title {
+  margin-bottom: 0;
+}
+.section-title-row .section-title::after { display: none; }
+.section-title-row {
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(201,185,122,0.18);
+}
+
+.btn-add-session {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--gold);
+  text-decoration: none;
+  border: 1px solid rgba(201,185,122,0.4);
+  border-radius: 6px;
+  padding: 0.4rem 0.85rem;
+  white-space: nowrap;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.btn-add-session:hover { background: rgba(201,185,122,0.08); }
+
+/* Edit button on session cards */
+.btn-edit-session {
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.28rem 0.6rem;
+  white-space: nowrap;
+  transition: color 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+.btn-edit-session:hover { color: var(--gold); border-color: rgba(201,185,122,0.5); }
+
 /* ==========================================
    SESSIONS GRID
    ========================================== */
@@ -460,6 +512,10 @@ th.sort-desc::after { content: ' ↓'; opacity: 1; color: var(--gold); }
   background: rgba(201,185,122,0.07);
   padding: 0.8rem 1.1rem;
   border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
 .session-game {

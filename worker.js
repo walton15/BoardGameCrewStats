@@ -77,6 +77,13 @@ export default {
       fileData.sessions.push({ id: nextId, ...session });
       commitMessage = `Add session: ${session.game} (${session.date})`;
 
+    } else if (type === 'update-session') {
+      const { id, date, game, placements, guests } = data;
+      const idx = fileData.sessions.findIndex(s => s.id === id);
+      if (idx === -1) return jsonRes({ error: `Session ${id} not found` }, 404);
+      fileData.sessions[idx] = { id, date, game, placements, guests: guests || [] };
+      commitMessage = `Update session: ${game} (${date})`;
+
     } else if (type === 'photo') {
       const { playerId, imageUrl } = data;
       const player = fileData.players.find(p => p.id === playerId);

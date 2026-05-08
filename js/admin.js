@@ -2,6 +2,9 @@
 // After deploying worker.js to Cloudflare, replace the URL below.
 const WORKER_URL = 'https://board-game-crew-stats.moseleywalton.workers.dev';
 
+const editParam = new URLSearchParams(window.location.search).get('edit');
+const editId    = editParam ? Number(editParam) : null;
+
 let currentData = null;
 let guestCount  = 0;
 
@@ -80,6 +83,40 @@ function populateGameDatalist() {
   list.innerHTML = games.map(g => `<option value="${g}">`).join('');
 }
 
+// ── Edit mode population ──────────────────────────────────────────────────────
+
+function populateEditForm() {
+  if (!currentData) return;
+  const session = currentData.sessions.find(s => s.id === editId);
+  if (!session) { setStatus('Session not found.', 'error'); return; }
+
+  document.getElementById('session-date').value = session.date;
+  document.getElementById('session-game').value = session.game;
+
+  document.querySelectorAll('#player-rows .player-placement-row').forEach(row => {
+    const placement   = session.placements.find(p => p.playerId === row.dataset.playerId);
+    const placeInput  = row.querySelector('.place-input');
+    const absentCheck = row.querySelector('.absent-check');
+    if (placement) {
+      placeInput.value    = placement.place;
+      absentCheck.checked = false;
+      placeInput.disabled = false;
+    } else {
+      absentCheck.checked = true;
+      placeInput.disabled = true;
+      placeInput.value    = '';
+    }
+  });
+
+  (session.guests || []).forEach(g => {
+    addGuest();
+    const rows    = document.querySelectorAll('#guest-entries .guest-entry');
+    const lastRow = rows[rows.length - 1];
+    lastRow.querySelector('.guest-name-input').value  = g.name;
+    lastRow.querySelector('.guest-place-input').value = g.place;
+  });
+}
+
 // ── Guests ────────────────────────────────────────────────────────────────────
 
 function addGuest() {
@@ -143,15 +180,18 @@ async function handleSubmit(e) {
   setStatus('Saving…', 'info');
 
   try {
-    await workerPost('session', { date, game, placements, guests });
-
-    setStatus(`✓ "${game}" saved successfully!`, 'success');
-    document.getElementById('session-form').reset();
-    document.getElementById('guest-entries').innerHTML = '';
-    guestCount = 0;
-    document.getElementById('session-date').valueAsDate = new Date();
-    document.querySelectorAll('.place-input').forEach(i => { i.disabled = false; });
-
+    if (editId) {
+      await workerPost('update-session', { id: editId, date, game, placements, guests });
+      setStatus(`✓ Session updated successfully!`, 'success');
+    } else {
+      await workerPost('session', { date, game, placements, guests });
+      setStatus(`✓ "${game}" saved successfully!`, 'success');
+      document.getElementById('session-form').reset();
+      document.getElementById('guest-entries').innerHTML = '';
+      guestCount = 0;
+      document.getElementById('session-date').valueAsDate = new Date();
+      document.querySelectorAll('.place-input').forEach(i => { i.disabled = false; });
+    }
   } catch (err) {
     setStatus(`Error: ${err.message}`, 'error');
   } finally {
@@ -162,10 +202,17 @@ async function handleSubmit(e) {
 // ── Init ──────────────────────────────────────────────────────────────────────
 
 async function init() {
+  if (editId) {
+    document.querySelector('.admin-title').textContent = '🎲 Edit Session';
+    document.getElementById('btn-submit').textContent = 'Save Changes';
+  }
+
   document.getElementById('session-date').valueAsDate = new Date();
   document.getElementById('btn-add-guest').addEventListener('click', addGuest);
   document.getElementById('session-form').addEventListener('submit', handleSubmit);
+
   await loadData();
+  if (editId) populateEditForm();
 }
 
 init();
