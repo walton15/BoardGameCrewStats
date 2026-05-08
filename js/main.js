@@ -359,6 +359,7 @@ function renderSessions(sessions, players) {
           <div>
             <div class="session-game">🎲 ${s.game}</div>
             <div class="session-date">${dateStr}</div>
+            ${s.updatedBy ? `<div class="session-meta">by ${s.updatedBy}</div>` : ''}
           </div>
           <a href="session.html?edit=${s.id}" class="btn-edit-session">Edit</a>
         </div>

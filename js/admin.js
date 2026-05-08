@@ -1,6 +1,6 @@
 // ── Configuration ────────────────────────────────────────────────────────────
-// After deploying worker.js to Cloudflare, replace the URL below.
 const WORKER_URL = 'https://board-game-crew-stats.moseleywalton.workers.dev';
+const AUTHOR_KEY = 'bgcs_author';
 
 const editParam = new URLSearchParams(window.location.search).get('edit');
 const editId    = editParam ? Number(editParam) : null;
@@ -19,6 +19,23 @@ async function workerPost(type, data) {
   const json = await res.json();
   if (!res.ok || json.error) throw new Error(json.error ?? `Worker error ${res.status}`);
   return json;
+}
+
+// ── Author bar ────────────────────────────────────────────────────────────────
+
+function getAuthor()       { return localStorage.getItem(AUTHOR_KEY) || ''; }
+function saveAuthor(name)  { localStorage.setItem(AUTHOR_KEY, name.trim()); }
+
+function updateAuthorUI() {
+  const name = getAuthor();
+  if (name) {
+    document.getElementById('author-set').style.display  = 'flex';
+    document.getElementById('author-name-text').textContent = name;
+    document.getElementById('author-unset').style.display = 'none';
+  } else {
+    document.getElementById('author-set').style.display  = 'none';
+    document.getElementById('author-unset').style.display = 'flex';
+  }
 }
 
 // ── Load data ─────────────────────────────────────────────────────────────────
@@ -142,13 +159,53 @@ function setStatus(msg, type) {
   if (type) el.classList.add(`status-${type}`, 'visible');
 }
 
+function setDeleteStatus(msg, type) {
+  const el = document.getElementById('delete-status');
+  el.textContent = msg;
+  el.className = 'status-msg';
+  if (type) el.classList.add(`status-${type}`, 'visible');
+}
+
+// ── Delete ────────────────────────────────────────────────────────────────────
+
+function initDeleteSection() {
+  if (!editId) return;
+  document.getElementById('delete-section').style.display = 'block';
+
+  document.getElementById('btn-delete').addEventListener('click', () => {
+    document.getElementById('delete-prompt').style.display  = 'none';
+    document.getElementById('delete-confirm').style.display = 'block';
+  });
+
+  document.getElementById('btn-cancel-delete').addEventListener('click', () => {
+    document.getElementById('delete-confirm').style.display = 'none';
+    document.getElementById('delete-prompt').style.display  = 'block';
+  });
+
+  document.getElementById('btn-confirm-delete').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-confirm-delete');
+    btn.disabled = true;
+    setDeleteStatus('Deleting…', 'info');
+    try {
+      await workerPost('delete-session', { id: editId, deletedBy: getAuthor() || 'Unknown' });
+      setDeleteStatus('Session deleted.', 'success');
+      setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+    } catch (err) {
+      setDeleteStatus(`Error: ${err.message}`, 'error');
+      btn.disabled = false;
+    }
+  });
+}
+
 // ── Submit ────────────────────────────────────────────────────────────────────
 
 async function handleSubmit(e) {
   e.preventDefault();
 
-  const date = document.getElementById('session-date').value;
-  const game = document.getElementById('session-game').value.trim();
+  const date   = document.getElementById('session-date').value;
+  const game   = document.getElementById('session-game').value.trim();
+  const author = getAuthor() || 'Unknown';
+
   if (!date || !game) {
     setStatus('Date and game name are required.', 'error');
     return;
@@ -181,10 +238,10 @@ async function handleSubmit(e) {
 
   try {
     if (editId) {
-      await workerPost('update-session', { id: editId, date, game, placements, guests });
+      await workerPost('update-session', { id: editId, date, game, placements, guests, updatedBy: author });
       setStatus(`✓ Session updated successfully!`, 'success');
     } else {
-      await workerPost('session', { date, game, placements, guests });
+      await workerPost('session', { date, game, placements, guests, updatedBy: author });
       setStatus(`✓ "${game}" saved successfully!`, 'success');
       document.getElementById('session-form').reset();
       document.getElementById('guest-entries').innerHTML = '';
@@ -207,12 +264,30 @@ async function init() {
     document.getElementById('btn-submit').textContent = 'Save Changes';
   }
 
+  // Author bar
+  updateAuthorUI();
+  document.getElementById('btn-save-author').addEventListener('click', () => {
+    const val = document.getElementById('author-input').value.trim();
+    if (!val) return;
+    saveAuthor(val);
+    document.getElementById('author-input').value = '';
+    updateAuthorUI();
+  });
+  document.getElementById('author-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btn-save-author').click(); }
+  });
+  document.getElementById('btn-change-author').addEventListener('click', () => {
+    localStorage.removeItem(AUTHOR_KEY);
+    updateAuthorUI();
+  });
+
   document.getElementById('session-date').valueAsDate = new Date();
   document.getElementById('btn-add-guest').addEventListener('click', addGuest);
   document.getElementById('session-form').addEventListener('submit', handleSubmit);
 
   await loadData();
   if (editId) populateEditForm();
+  initDeleteSection();
 }
 
 init();

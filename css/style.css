@@ -947,6 +947,86 @@ footer {
 .status-error   { background: rgba(224,84,84,0.1);   color: var(--error);   border: 1px solid rgba(224,84,84,0.3); }
 .status-info    { background: rgba(91,155,213,0.1);  color: var(--info);    border: 1px solid rgba(91,155,213,0.3); }
 
+/* Session meta (updated by) */
+.session-meta {
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-style: italic;
+  margin-top: 0.1rem;
+}
+
+/* Delete section */
+.delete-card {
+  border-color: rgba(224,84,84,0.25);
+}
+
+.btn-delete {
+  width: 100%;
+  background: none;
+  border: 1px solid rgba(224,84,84,0.4);
+  border-radius: 8px;
+  color: var(--error);
+  cursor: pointer;
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.75rem;
+  min-height: 48px;
+  transition: background 0.2s;
+}
+.btn-delete:hover { background: rgba(224,84,84,0.08); }
+
+.delete-confirm-text {
+  text-align: center;
+  color: var(--error);
+  font-style: italic;
+  font-size: 0.9rem;
+  margin-bottom: 0.85rem;
+}
+
+.delete-confirm-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-cancel-delete {
+  flex: 1;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 0.7rem;
+  min-height: 48px;
+  transition: background 0.2s;
+}
+.btn-cancel-delete:hover { background: rgba(201,185,122,0.05); color: var(--text); }
+
+.btn-confirm-delete {
+  flex: 1;
+  background: rgba(224,84,84,0.1);
+  border: 1px solid rgba(224,84,84,0.5);
+  border-radius: 8px;
+  color: var(--error);
+  cursor: pointer;
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 0.7rem;
+  min-height: 48px;
+  transition: background 0.2s;
+}
+.btn-confirm-delete:hover:not(:disabled) { background: rgba(224,84,84,0.2); }
+.btn-confirm-delete:disabled { opacity: 0.45; cursor: not-allowed; }
+
 /* ==========================================
    PHOTOS PAGE
    ========================================== */
