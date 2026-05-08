@@ -218,6 +218,7 @@ function renderChart(ranked, sessions) {
       interaction: { mode: 'index', intersect: false },
       scales: {
         y: {
+          afterFit: scale => { scale.width = 56; },
           reverse: true,
           min: 0.5,
           ticks: { stepSize: 1, callback: v => Number.isInteger(v) ? `#${v}` : null, color: '#c9b97a', font: { size: 13 } },
