@@ -214,6 +214,7 @@ function renderChart(ranked, sessions) {
       responsive: true,
       maintainAspectRatio: false,
       animation: { duration: 700, easing: 'easeInOutQuart' },
+      events: ['click'],
       interaction: { mode: 'index', intersect: false },
       scales: {
         y: {
@@ -249,6 +250,13 @@ function renderChart(ranked, sessions) {
         zoom: { pan: { enabled: false } },
       },
     },
+  });
+
+  document.addEventListener('click', e => {
+    if (e.target !== el) {
+      chart.tooltip.setActiveElements([], {});
+      chart.update('none');
+    }
   });
 
   if (!canPan) return;
