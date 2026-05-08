@@ -351,9 +351,10 @@ main {
   flex-shrink: 0;
 }
 
-.td-avg { font-family: 'Cinzel', serif; color: var(--gold); font-weight: 600; }
-.td-best  { color: #6ec99a; }
-.td-worst { color: #c97070; }
+.td-avg    { font-family: 'Cinzel', serif; color: var(--gold); font-weight: 600; }
+.td-worst  { color: #c97070; }
+.td-firsts { color: #6ec99a; font-family: 'Cinzel', serif; }
+.td-lasts  { color: #c97070; font-family: 'Cinzel', serif; }
 
 /* ==========================================
    CHART
@@ -855,7 +856,9 @@ footer {
   .sessions-grid { grid-template-columns: 1fr; }
 
   .rankings-table th:nth-child(4),
-  .rankings-table td:nth-child(4) { display: none; }
+  .rankings-table td:nth-child(4),
+  .rankings-table th:nth-child(5),
+  .rankings-table td:nth-child(5) { display: none; }
 }
 
 @media (max-width: 380px) {

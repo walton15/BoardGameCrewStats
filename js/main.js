@@ -6,9 +6,21 @@ async function loadData() {
 
 function calcStats(players, sessions) {
   const ranked = players.map(player => {
-    const places = sessions
-      .map(s => s.placements.find(p => p.playerId === player.id)?.place)
-      .filter(p => p !== undefined);
+    let firstCount = 0;
+    let lastCount  = 0;
+    const places = [];
+
+    sessions.forEach(s => {
+      const found = s.placements.find(p => p.playerId === player.id);
+      if (!found) return;
+      places.push(found.place);
+      if (found.place === 1) firstCount++;
+      const worstPlace = Math.max(
+        ...s.placements.map(p => p.place),
+        ...(s.guests || []).map(g => g.place),
+      );
+      if (found.place === worstPlace) lastCount++;
+    });
 
     const avg = places.length
       ? +(places.reduce((a, b) => a + b, 0) / places.length).toFixed(2)
@@ -17,9 +29,10 @@ function calcStats(players, sessions) {
     return {
       ...player,
       avg,
-      best:         places.length ? Math.min(...places) : null,
       worst:        places.length ? Math.max(...places) : null,
       sessionCount: places.length,
+      firstCount,
+      lastCount,
     };
   });
 
@@ -93,6 +106,8 @@ function renderRankings(ranked) {
         <td class="td-avg">${p.avg?.toFixed(2) ?? '—'}</td>
         <td class="td-worst">${p.worst !== null ? `#${p.worst}` : '—'}</td>
         <td>${p.sessionCount}</td>
+        <td class="td-firsts">${p.firstCount}</td>
+        <td class="td-lasts">${p.lastCount}</td>
       </tr>
     `;
   }).join('');
