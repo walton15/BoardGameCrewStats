@@ -1,6 +1,6 @@
 // ── Configuration ────────────────────────────────────────────────────────────
 // After deploying worker.js to Cloudflare, replace the URL below.
-const WORKER_URL = 'https://YOUR-WORKER.YOUR-SUBDOMAIN.workers.dev';
+const WORKER_URL = 'https://board-game-crew-stats.moseleywalton.workers.dev';
 
 let currentData = null;
 let guestCount  = 0;

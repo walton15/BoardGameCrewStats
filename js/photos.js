@@ -2,7 +2,7 @@
 // Get a free API key at https://api.imgbb.com/ then replace the value below.
 const IMGBB_KEY  = '31172bd4104090e1b67cdc19a872693d';
 // After deploying worker.js to Cloudflare, replace the URL below.
-const WORKER_URL = 'https://YOUR-WORKER.YOUR-SUBDOMAIN.workers.dev';
+const WORKER_URL = 'https://board-game-crew-stats.moseleywalton.workers.dev';
 
 const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
 
