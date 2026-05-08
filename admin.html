@@ -16,7 +16,10 @@
 
   <header class="admin-header">
     <div class="admin-title">🎲 Add Session</div>
-    <a href="index.html" class="admin-home-link">← Back to Stats</a>
+    <div style="display:flex;gap:1rem;align-items:center">
+      <a href="photos.html" class="admin-home-link">📷 Photos</a>
+      <a href="index.html" class="admin-home-link">← Back to Stats</a>
+    </div>
   </header>
 
   <!-- Auth bar -->
@@ -70,6 +73,7 @@
         <div class="admin-card-title">Player Placements</div>
         <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem;font-style:italic;">
           Enter each player's finishing place (ties OK). Check Absent if they didn't play.
+          For games decided by elimination, use death order — first to die gets last place.
         </p>
         <div id="player-rows"></div>
       </div>

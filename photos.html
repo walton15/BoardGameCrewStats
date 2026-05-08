@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0f1923">
+  <title>Player Photos — Board Game Crew Stats</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎲</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="admin-header">
+    <div class="admin-title">📷 Player Photos</div>
+    <a href="index.html" class="admin-home-link">← Back to Stats</a>
+  </header>
+
+  <main class="admin-main">
+
+    <!-- Setup notice — shown if IMGBB_KEY is not configured -->
+    <div id="setup-notice" class="admin-card" style="display:none">
+      <div class="admin-card-title">⚙️ One-Time Setup Required</div>
+      <p style="margin-bottom:1rem;line-height:1.8;">
+        Photo uploading uses <strong style="color:var(--gold)">imgbb</strong> for free image hosting.
+        A free API key is required — takes about 2 minutes to set up:
+      </p>
+      <ol style="padding-left:1.25rem;line-height:2;color:var(--muted);font-size:0.95rem;">
+        <li>Go to <strong style="color:var(--text)">api.imgbb.com</strong> and create a free account</li>
+        <li>Copy your API key from the dashboard</li>
+        <li>Open <code style="background:rgba(255,255,255,0.07);padding:0.1rem 0.4rem;border-radius:3px">js/photos.js</code> and replace <code style="background:rgba(255,255,255,0.07);padding:0.1rem 0.4rem;border-radius:3px">YOUR_IMGBB_API_KEY</code> with your key</li>
+        <li>Commit and push — done!</li>
+      </ol>
+    </div>
+
+    <!-- Current photos grid -->
+    <div class="admin-card">
+      <div class="admin-card-title">Select a Player</div>
+      <p style="font-size:0.85rem;color:var(--muted);font-style:italic;margin-bottom:1.25rem;">
+        Tap a player to upload or update their photo. Anyone can upload — no token needed.
+      </p>
+      <div id="player-grid" class="photo-player-grid">
+        <p class="empty-state">Loading players&hellip;</p>
+      </div>
+    </div>
+
+    <!-- Upload card — hidden until player selected -->
+    <div id="upload-card" class="admin-card" style="display:none">
+      <div class="admin-card-title" id="upload-card-title">Upload Photo</div>
+
+      <div class="photo-upload-area" id="upload-area" role="button" tabindex="0" aria-label="Choose photo">
+        <div id="upload-placeholder" class="upload-placeholder">
+          <span class="upload-icon">📁</span>
+          <span>Tap to choose a photo</span>
+          <span style="font-size:0.8rem;color:var(--muted)">JPG, PNG, GIF &mdash; max 5 MB</span>
+        </div>
+        <img id="upload-preview" class="upload-preview-img" style="display:none" alt="Preview">
+        <input type="file" id="photo-input" accept="image/*" style="display:none" aria-label="Photo file">
+      </div>
+
+      <button type="button" id="btn-upload" class="btn-submit" style="margin-top:1rem" disabled>
+        Upload &amp; Save Photo
+      </button>
+      <div id="upload-status" class="status-msg" role="alert" aria-live="polite"></div>
+    </div>
+
+  </main>
+
+  <footer>
+    <div class="footer-suits">♠ &nbsp; ♥ &nbsp; ♦ &nbsp; ♣</div>
+    <p>Board Game Crew Stats</p>
+  </footer>
+
+  <script src="js/photos.js"></script>
+</body>
+</html>

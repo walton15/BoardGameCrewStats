@@ -77,6 +77,75 @@
       "guests": [
         { "name": "Morgan", "place": 1 }
       ]
+    },
+    {
+      "id": 6,
+      "date": "2025-04-11",
+      "game": "Clue",
+      "placements": [
+        { "playerId": "autumn", "place": 1 },
+        { "playerId": "walton", "place": 2 },
+        { "playerId": "taylor", "place": 3 },
+        { "playerId": "maddy",  "place": 4 },
+        { "playerId": "jack",   "place": 5 }
+      ],
+      "guests": []
+    },
+    {
+      "id": 7,
+      "date": "2025-04-25",
+      "game": "Dominion",
+      "placements": [
+        { "playerId": "jack",   "place": 1 },
+        { "playerId": "taylor", "place": 1 },
+        { "playerId": "walton", "place": 3 },
+        { "playerId": "maddy",  "place": 4 },
+        { "playerId": "autumn", "place": 5 }
+      ],
+      "guests": [
+        { "name": "Chris", "place": 2 }
+      ]
+    },
+    {
+      "id": 8,
+      "date": "2025-05-02",
+      "game": "Coup",
+      "placements": [
+        { "playerId": "walton", "place": 1 },
+        { "playerId": "autumn", "place": 2 },
+        { "playerId": "maddy",  "place": 3 },
+        { "playerId": "taylor", "place": 4 },
+        { "playerId": "jack",   "place": 5 }
+      ],
+      "guests": []
+    },
+    {
+      "id": 9,
+      "date": "2025-05-09",
+      "game": "Betrayal at House on the Hill",
+      "placements": [
+        { "playerId": "maddy",  "place": 1 },
+        { "playerId": "walton", "place": 2 },
+        { "playerId": "taylor", "place": 3 },
+        { "playerId": "autumn", "place": 4 },
+        { "playerId": "jack",   "place": 4 }
+      ],
+      "guests": [
+        { "name": "Alex", "place": 1 }
+      ]
+    },
+    {
+      "id": 10,
+      "date": "2025-05-16",
+      "game": "7 Wonders",
+      "placements": [
+        { "playerId": "taylor", "place": 1 },
+        { "playerId": "maddy",  "place": 2 },
+        { "playerId": "autumn", "place": 3 },
+        { "playerId": "jack",   "place": 4 },
+        { "playerId": "walton", "place": 5 }
+      ],
+      "guests": []
     }
   ]
 }
