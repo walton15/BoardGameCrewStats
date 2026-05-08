@@ -433,7 +433,7 @@ th.sort-desc::after { content: ' ↓'; opacity: 1; color: var(--gold); }
 .chart-wrap { position: relative; padding: 0.5rem 0; height: 420px; }
 
 @media (max-width: 600px) {
-  .chart-wrap { height: 260px; }
+  .chart-wrap { height: 360px; }
 }
 
 /* ==========================================
