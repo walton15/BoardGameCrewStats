@@ -91,7 +91,6 @@ function renderRankings(ranked) {
           ${p.name}
         </td>
         <td class="td-avg">${p.avg?.toFixed(2) ?? '—'}</td>
-        <td class="td-best">${p.best  !== null ? `#${p.best}`  : '—'}</td>
         <td class="td-worst">${p.worst !== null ? `#${p.worst}` : '—'}</td>
         <td>${p.sessionCount}</td>
       </tr>

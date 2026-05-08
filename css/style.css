@@ -854,8 +854,8 @@ footer {
 
   .sessions-grid { grid-template-columns: 1fr; }
 
-  .rankings-table th:nth-child(5),
-  .rankings-table td:nth-child(5) { display: none; }
+  .rankings-table th:nth-child(4),
+  .rankings-table td:nth-child(4) { display: none; }
 }
 
 @media (max-width: 380px) {
