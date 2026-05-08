@@ -144,18 +144,6 @@ main {
   position: relative;
 }
 
-.section-card::before {
-  content: '⚄';
-  position: absolute;
-  top: -0.65rem;
-  left: 1.5rem;
-  background: var(--surface);
-  padding: 0 0.5rem;
-  color: var(--gold);
-  opacity: 0.45;
-  font-size: 1.1rem;
-  line-height: 1;
-}
 
 .section-title {
   font-size: clamp(1.05rem, 2.5vw, 1.55rem);
