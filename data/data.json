@@ -1,0 +1,82 @@
+{
+  "players": [
+    { "id": "taylor", "name": "Taylor", "color": "#e8534a", "image": null },
+    { "id": "autumn", "name": "Autumn", "color": "#e8962a", "image": null },
+    { "id": "walton", "name": "Walton", "color": "#4a90d9", "image": null },
+    { "id": "jack",   "name": "Jack",   "color": "#3dba7a", "image": null },
+    { "id": "maddy",  "name": "Maddy",  "color": "#9b59b6", "image": null }
+  ],
+  "sessions": [
+    {
+      "id": 1,
+      "date": "2025-01-10",
+      "game": "Catan",
+      "placements": [
+        { "playerId": "taylor", "place": 1 },
+        { "playerId": "walton", "place": 2 },
+        { "playerId": "autumn", "place": 3 },
+        { "playerId": "maddy",  "place": 4 },
+        { "playerId": "jack",   "place": 5 }
+      ],
+      "guests": []
+    },
+    {
+      "id": 2,
+      "date": "2025-01-31",
+      "game": "Ticket to Ride",
+      "placements": [
+        { "playerId": "maddy",  "place": 1 },
+        { "playerId": "jack",   "place": 2 },
+        { "playerId": "autumn", "place": 2 },
+        { "playerId": "taylor", "place": 4 },
+        { "playerId": "walton", "place": 5 }
+      ],
+      "guests": [
+        { "name": "Sam", "place": 2 }
+      ]
+    },
+    {
+      "id": 3,
+      "date": "2025-02-14",
+      "game": "Wingspan",
+      "placements": [
+        { "playerId": "walton", "place": 1 },
+        { "playerId": "taylor", "place": 2 },
+        { "playerId": "maddy",  "place": 3 },
+        { "playerId": "autumn", "place": 4 },
+        { "playerId": "jack",   "place": 5 }
+      ],
+      "guests": [
+        { "name": "Riley", "place": 3 }
+      ]
+    },
+    {
+      "id": 4,
+      "date": "2025-03-01",
+      "game": "Azul",
+      "placements": [
+        { "playerId": "jack",   "place": 1 },
+        { "playerId": "autumn", "place": 2 },
+        { "playerId": "taylor", "place": 3 },
+        { "playerId": "walton", "place": 4 },
+        { "playerId": "maddy",  "place": 5 }
+      ],
+      "guests": []
+    },
+    {
+      "id": 5,
+      "date": "2025-03-28",
+      "game": "Scythe",
+      "placements": [
+        { "playerId": "autumn", "place": 1 },
+        { "playerId": "maddy",  "place": 2 },
+        { "playerId": "jack",   "place": 3 },
+        { "playerId": "taylor", "place": 4 },
+        { "playerId": "walton", "place": 4 }
+      ],
+      "guests": [
+        { "name": "Morgan", "place": 1 }
+      ]
+    }
+  ]
+}

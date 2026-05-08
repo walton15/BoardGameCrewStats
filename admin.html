@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0f1923">
+  <title>Admin — Board Game Crew Stats</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎲</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="admin-header">
+    <div class="admin-title">🎲 Add Session</div>
+    <a href="index.html" class="admin-home-link">← Back to Stats</a>
+  </header>
+
+  <!-- Auth bar -->
+  <div class="auth-bar" id="auth-bar">
+    <span class="auth-label">GitHub Token</span>
+    <div class="pat-input-wrap" id="pat-input-wrap">
+      <input
+        type="password"
+        id="pat-input"
+        class="pat-input"
+        placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+        autocomplete="off"
+        aria-label="GitHub Personal Access Token"
+      >
+      <button type="button" id="btn-save-pat" class="btn-save-pat">Save &amp; Connect</button>
+    </div>
+    <div id="auth-status"></div>
+  </div>
+
+  <main class="admin-main">
+
+    <form id="session-form" novalidate>
+
+      <!-- Session info -->
+      <div class="admin-card">
+        <div class="admin-card-title">Session Details</div>
+
+        <div class="form-field">
+          <label for="session-date">Date</label>
+          <input type="date" id="session-date" class="form-input" required aria-required="true">
+        </div>
+
+        <div class="form-field">
+          <label for="session-game">Game</label>
+          <input
+            type="text"
+            id="session-game"
+            class="form-input"
+            placeholder="e.g. Catan"
+            required
+            aria-required="true"
+            list="game-suggestions"
+            autocomplete="off"
+          >
+          <datalist id="game-suggestions"></datalist>
+        </div>
+      </div>
+
+      <!-- Player placements -->
+      <div class="admin-card">
+        <div class="admin-card-title">Player Placements</div>
+        <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem;font-style:italic;">
+          Enter each player's finishing place (ties OK). Check Absent if they didn't play.
+        </p>
+        <div id="player-rows"></div>
+      </div>
+
+      <!-- Guests -->
+      <div class="admin-card">
+        <div class="admin-card-title">Guests (optional)</div>
+        <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem;font-style:italic;">
+          Guests are shown in sessions but excluded from overall rankings.
+        </p>
+        <div id="guest-entries" class="guest-entries"></div>
+        <button type="button" id="btn-add-guest" class="btn-add-guest">+ Add Guest</button>
+      </div>
+
+      <!-- Submit -->
+      <div class="admin-card">
+        <button type="submit" id="btn-submit" class="btn-submit">Save Session</button>
+        <div id="submit-status" class="status-msg" role="alert" aria-live="polite"></div>
+      </div>
+
+    </form>
+
+  </main>
+
+  <footer>
+    <div class="footer-suits">♠ &nbsp; ♥ &nbsp; ♦ &nbsp; ♣</div>
+    <p>Board Game Crew Stats</p>
+  </footer>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>

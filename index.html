@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0f1923">
+  <title>Board Game Crew Stats</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎲</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-suits-top">♠ &nbsp; ♥ &nbsp; ♦ &nbsp; ♣</div>
+    <div class="header-trophy">🏆</div>
+    <h1>Board Game Crew Stats</h1>
+    <p class="header-sub">May the dice always roll in your favor</p>
+    <div class="header-suits-bottom">♣ &nbsp; ♦ &nbsp; ♥ &nbsp; ♠</div>
+  </header>
+
+  <nav class="site-nav" aria-label="Page sections">
+    <a href="#podium">Champions</a>
+    <a href="#rankings">Rankings</a>
+    <a href="#history">History</a>
+    <a href="#sessions">Sessions</a>
+  </nav>
+
+  <main>
+
+    <!-- ── Podium ── -->
+    <section id="podium" class="section-card">
+      <h2 class="section-title">Overall Champions</h2>
+      <p class="section-desc">Average placement across all game nights &mdash; lower is better</p>
+      <div id="podium-container" class="podium-wrap">
+        <p class="empty-state">Loading&hellip;</p>
+      </div>
+    </section>
+
+    <!-- ── Rankings ── -->
+    <section id="rankings" class="section-card">
+      <h2 class="section-title">Full Rankings</h2>
+      <div class="table-scroll">
+        <table class="rankings-table" aria-label="Player rankings">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Player</th>
+              <th>Avg</th>
+              <th>Best</th>
+              <th>Worst</th>
+              <th>Sessions</th>
+            </tr>
+          </thead>
+          <tbody id="rankings-body">
+            <tr><td colspan="6" class="empty-state">Loading&hellip;</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── Chart ── -->
+    <section id="history" class="section-card">
+      <h2 class="section-title">Placement History</h2>
+      <p class="section-desc">Placement per session &mdash; top of the chart is 1st place</p>
+      <div class="chart-wrap">
+        <canvas id="placementChart" aria-label="Placement history chart" role="img"></canvas>
+      </div>
+    </section>
+
+    <!-- ── Sessions ── -->
+    <section id="sessions" class="section-card">
+      <h2 class="section-title">Game Sessions</h2>
+      <div id="sessions-container" class="sessions-grid">
+        <p class="empty-state">Loading&hellip;</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="footer-suits">♠ &nbsp; ♥ &nbsp; ♦ &nbsp; ♣</div>
+    <p>Board Game Crew Stats &mdash; <a href="admin.html" style="color:var(--muted);text-underline-offset:3px">Admin</a></p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
