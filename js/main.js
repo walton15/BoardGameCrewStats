@@ -214,12 +214,11 @@ function renderChart(ranked, sessions) {
       responsive: true,
       maintainAspectRatio: false,
       animation: { duration: 700, easing: 'easeInOutQuart' },
-      layout: { padding: { top: 14, bottom: 4 } },
       interaction: { mode: 'index', intersect: false },
       scales: {
         y: {
           reverse: true,
-          min: 1,
+          min: 0.5,
           ticks: { stepSize: 1, callback: v => `#${v}`, color: '#c9b97a', font: { size: 13 } },
           grid: { color: 'rgba(201,185,122,0.12)' },
           title: { display: true, text: 'Placement', color: '#c9b97a' },
