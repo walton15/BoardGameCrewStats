@@ -1,6 +1,6 @@
 // ── Configuration ────────────────────────────────────────────────────────────
 // Get a free API key at https://api.imgbb.com/ then replace the value below.
-const IMGBB_KEY  = 'YOUR_IMGBB_API_KEY';
+const IMGBB_KEY  = '31172bd4104090e1b67cdc19a872693d';
 
 const OWNER     = 'walton15';
 const REPO      = 'BoardGameCrewStats';
