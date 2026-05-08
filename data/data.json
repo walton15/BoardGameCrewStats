@@ -34,9 +34,49 @@
   "sessions": [
     {
       "id": 1,
-      "date": "2025-01-10",
-      "game": "Catan",
+      "date": "2026-01-29",
+      "game": "Finspan",
       "placements": [
+        {
+          "playerId": "maddy",
+          "place": 3
+        },
+        {
+          "playerId": "jack",
+          "place": 1
+        },
+        {
+          "playerId": "autumn",
+          "place": 4
+        },
+        {
+          "playerId": "taylor",
+          "place": 2
+        },
+        {
+          "playerId": "walton",
+          "place": 5
+        }
+      ],
+      "guests": []
+    }
+    {
+      "id": 2,
+      "date": "2025-02-26",
+      "game": "Bear Attack",
+      "placements": [
+        {
+          "playerId": "maddy",
+          "place": 5
+        },
+        {
+          "playerId": "jack",
+          "place": 4
+        },
+        {
+          "playerId": "autumn",
+          "place": 3
+        },
         {
           "playerId": "taylor",
           "place": 1
@@ -44,62 +84,25 @@
         {
           "playerId": "walton",
           "place": 2
-        },
-        {
-          "playerId": "autumn",
-          "place": 3
-        },
-        {
-          "playerId": "maddy",
-          "place": 4
-        },
-        {
-          "playerId": "jack",
-          "place": 5
         }
       ],
       "guests": []
     },
     {
-      "id": 2,
-      "date": "2025-01-31",
-      "game": "Ticket to Ride",
-      "placements": [
-        {
-          "playerId": "maddy",
-          "place": 1
-        },
-        {
-          "playerId": "jack",
-          "place": 2
-        },
-        {
-          "playerId": "autumn",
-          "place": 2
-        },
-        {
-          "playerId": "taylor",
-          "place": 4
-        },
-        {
-          "playerId": "walton",
-          "place": 5
-        }
-      ],
-      "guests": [
-        {
-          "name": "Sam",
-          "place": 2
-        }
-      ]
-    },
-    {
       "id": 3,
-      "date": "2025-02-14",
-      "game": "Wingspan",
+      "date": "2026-03-19",
+      "game": "Mysterium",
       "placements": [
         {
-          "playerId": "walton",
+          "playerId": "maddy",
+          "place": 2
+        },
+        {
+          "playerId": "jack",
+          "place":2
+        },
+        {
+          "playerId": "autumn",
           "place": 1
         },
         {
@@ -107,266 +110,100 @@
           "place": 2
         },
         {
-          "playerId": "maddy",
-          "place": 3
-        },
-        {
-          "playerId": "autumn",
-          "place": 4
-        },
-        {
-          "playerId": "jack",
-          "place": 5
+          "playerId": "walton",
+          "place": 2
         }
       ],
-      "guests": [
-        {
-          "name": "Riley",
-          "place": 3
-        }
-      ]
+      "guests": []
     },
     {
       "id": 4,
-      "date": "2025-03-01",
-      "game": "Azul",
+      "date": "2026-04-07",
+      "game": "Werewolf",
       "placements": [
-        {
-          "playerId": "jack",
-          "place": 1
-        },
-        {
-          "playerId": "autumn",
-          "place": 2
-        },
-        {
-          "playerId": "taylor",
-          "place": 3
-        },
-        {
-          "playerId": "walton",
-          "place": 4
-        },
         {
           "playerId": "maddy",
           "place": 5
+        },
+        {
+          "playerId": "jack",
+          "place":2
+        },
+        {
+          "playerId": "autumn",
+          "place": 1
+        },
+        {
+          "playerId": "taylor",
+          "place": 2
+        },
+        {
+          "playerId": "walton",
+          "place": 2
         }
       ],
       "guests": []
     },
     {
       "id": 5,
-      "date": "2025-03-28",
-      "game": "Scythe",
-      "placements": [
-        {
-          "playerId": "autumn",
-          "place": 1
-        },
-        {
-          "playerId": "maddy",
-          "place": 2
-        },
-        {
-          "playerId": "jack",
-          "place": 3
-        },
-        {
-          "playerId": "taylor",
-          "place": 4
-        },
-        {
-          "playerId": "walton",
-          "place": 4
-        }
-      ],
-      "guests": [
-        {
-          "name": "Morgan",
-          "place": 1
-        }
-      ]
-    },
-    {
-      "id": 6,
-      "date": "2025-04-11",
-      "game": "Clue",
-      "placements": [
-        {
-          "playerId": "autumn",
-          "place": 1
-        },
-        {
-          "playerId": "walton",
-          "place": 2
-        },
-        {
-          "playerId": "taylor",
-          "place": 3
-        },
-        {
-          "playerId": "maddy",
-          "place": 4
-        },
-        {
-          "playerId": "jack",
-          "place": 5
-        }
-      ],
-      "guests": []
-    },
-    {
-      "id": 7,
-      "date": "2025-04-25",
-      "game": "Dominion",
-      "placements": [
-        {
-          "playerId": "jack",
-          "place": 1
-        },
-        {
-          "playerId": "taylor",
-          "place": 1
-        },
-        {
-          "playerId": "walton",
-          "place": 3
-        },
-        {
-          "playerId": "maddy",
-          "place": 4
-        },
-        {
-          "playerId": "autumn",
-          "place": 5
-        }
-      ],
-      "guests": [
-        {
-          "name": "Chris",
-          "place": 2
-        }
-      ]
-    },
-    {
-      "id": 8,
-      "date": "2025-05-02",
-      "game": "Coup",
-      "placements": [
-        {
-          "playerId": "walton",
-          "place": 1
-        },
-        {
-          "playerId": "autumn",
-          "place": 2
-        },
-        {
-          "playerId": "maddy",
-          "place": 3
-        },
-        {
-          "playerId": "taylor",
-          "place": 4
-        },
-        {
-          "playerId": "jack",
-          "place": 5
-        }
-      ],
-      "guests": []
-    },
-    {
-      "id": 9,
-      "date": "2025-05-09",
+      "date": "2026-04-23",
       "game": "Betrayal at House on the Hill",
       "placements": [
         {
           "playerId": "maddy",
-          "place": 1
-        },
-        {
-          "playerId": "walton",
           "place": 2
-        },
-        {
-          "playerId": "taylor",
-          "place": 3
-        },
-        {
-          "playerId": "autumn",
-          "place": 4
-        },
-        {
-          "playerId": "jack",
-          "place": 4
-        }
-      ],
-      "guests": [
-        {
-          "name": "Alex",
-          "place": 1
-        }
-      ]
-    },
-    {
-      "id": 10,
-      "date": "2025-05-16",
-      "game": "7 Wonders",
-      "placements": [
-        {
-          "playerId": "taylor",
-          "place": 1
-        },
-        {
-          "playerId": "maddy",
-          "place": 2
-        },
-        {
-          "playerId": "autumn",
-          "place": 3
         },
         {
           "playerId": "jack",
           "place": 4
         },
         {
-          "playerId": "walton",
+          "playerId": "autumn",
+          "place": 3
+        },
+        {
+          "playerId": "taylor",
           "place": 5
-        }
-      ],
-      "guests": []
-    },
-    {
-      "id": 11,
-      "date": "2026-05-08",
-      "game": "Test Game",
-      "placements": [
-        {
-          "playerId": "taylor",
-          "place": 3
-        },
-        {
-          "playerId": "autumn",
-          "place": 2
         },
         {
           "playerId": "walton",
           "place": 1
-        },
-        {
-          "playerId": "jack",
-          "place": 4
         }
       ],
       "guests": [
         {
           "name": "Evan",
+          "place": 6
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "date": "2026-05-07",
+      "game": "Bang!",
+      "placements": [
+        {
+          "playerId": "maddy",
           "place": 5
+        },
+        {
+          "playerId": "jack",
+          "place": 4
+        },
+        {
+          "playerId": "autumn",
+          "place": 3
+        },
+        {
+          "playerId": "taylor",
+          "place": 1
+        },
+        {
+          "playerId": "walton",
+          "place": 1
         }
       ],
-      "updatedBy": "Unknown",
-      "updatedAt": "2026-05-08"
+      "guests": []
     }
   ]
 }
