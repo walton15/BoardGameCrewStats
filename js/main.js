@@ -15,7 +15,7 @@ const SORT_DEFAULTS = {
 // ── Data ─────────────────────────────────────────────────────────────────────
 
 async function loadData() {
-  const res = await fetch('data/data.json');
+  const res = await fetch(`data/data.json?t=${Date.now()}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }

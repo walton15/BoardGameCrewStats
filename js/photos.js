@@ -48,7 +48,7 @@ async function loadData() {
   } catch {
     // Fallback: plain fetch (no SHA, can't commit)
     try {
-      const res = await fetch('data/data.json');
+      const res = await fetch(`data/data.json?t=${Date.now()}`);
       currentData = await res.json();
     } catch (err) {
       setStatus(`Could not load player data: ${err.message}`, 'error');
@@ -266,11 +266,7 @@ async function saveImageUrl(playerId, imageUrl) {
     const err = await putRes.json().catch(() => ({}));
     // 401/403 means no write access — still show the URL
     if (putRes.status === 401 || putRes.status === 403) {
-      setStatus(
-        `Photo uploaded! Save this URL to data.json manually (no write token found): ${imageUrl}`,
-        'info'
-      );
-      return;
+      throw new Error('No write access — save your GitHub token on the Add Session page first, then retry.');
     }
     throw new Error(err.message || `GitHub API error ${putRes.status}`);
   }
