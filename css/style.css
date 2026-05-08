@@ -947,14 +947,6 @@ footer {
 .status-error   { background: rgba(224,84,84,0.1);   color: var(--error);   border: 1px solid rgba(224,84,84,0.3); }
 .status-info    { background: rgba(91,155,213,0.1);  color: var(--info);    border: 1px solid rgba(91,155,213,0.3); }
 
-/* Session meta (updated by) */
-.session-meta {
-  font-size: 0.72rem;
-  color: var(--muted);
-  font-style: italic;
-  margin-top: 0.1rem;
-}
-
 /* Delete section */
 .delete-card {
   border-color: rgba(224,84,84,0.25);

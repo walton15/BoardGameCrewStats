@@ -69,30 +69,28 @@ export default {
 
     let commitMessage;
 
-    const now = new Date().toISOString().split('T')[0];
-
     if (type === 'session') {
-      const { date, game, placements, guests, updatedBy } = data;
+      const { date, game, placements, guests } = data;
       const nextId = fileData.sessions.length
         ? Math.max(...fileData.sessions.map(s => s.id)) + 1
         : 1;
-      fileData.sessions.push({ id: nextId, date, game, placements, guests: guests || [], updatedBy: updatedBy || 'Unknown', updatedAt: now });
-      commitMessage = `Add session: ${game} (${date})${updatedBy ? ` by ${updatedBy}` : ''}`;
+      fileData.sessions.push({ id: nextId, date, game, placements, guests: guests || [] });
+      commitMessage = `Add session: ${game} (${date})`;
 
     } else if (type === 'update-session') {
-      const { id, date, game, placements, guests, updatedBy } = data;
+      const { id, date, game, placements, guests } = data;
       const idx = fileData.sessions.findIndex(s => s.id === id);
       if (idx === -1) return jsonRes({ error: `Session ${id} not found` }, 404);
-      fileData.sessions[idx] = { id, date, game, placements, guests: guests || [], updatedBy: updatedBy || 'Unknown', updatedAt: now };
-      commitMessage = `Update session: ${game} (${date})${updatedBy ? ` by ${updatedBy}` : ''}`;
+      fileData.sessions[idx] = { id, date, game, placements, guests: guests || [] };
+      commitMessage = `Update session: ${game} (${date})`;
 
     } else if (type === 'delete-session') {
-      const { id, deletedBy } = data;
+      const { id } = data;
       const idx = fileData.sessions.findIndex(s => s.id === id);
       if (idx === -1) return jsonRes({ error: `Session ${id} not found` }, 404);
       const s = fileData.sessions[idx];
       fileData.sessions.splice(idx, 1);
-      commitMessage = `Delete session: ${s.game} (${s.date})${deletedBy ? ` by ${deletedBy}` : ''}`;
+      commitMessage = `Delete session: ${s.game} (${s.date})`;
 
     } else if (type === 'photo') {
       const { playerId, imageUrl } = data;
