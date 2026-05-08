@@ -228,9 +228,9 @@ function renderChart(ranked, sessions) {
           min: 0.5,
           ticks: { stepSize: 1, callback: v => Number.isInteger(v) ? `#${v}` : null, color: '#c9b97a', font: { size: 13 } },
           grid: { color: 'rgba(201,185,122,0.12)' },
-          title: { display: true, text: 'Placement', color: '#c9b97a' },
         },
         x: {
+          afterFit: scale => { scale.paddingLeft = 8; scale.paddingRight = 16; },
           min: canPan ? labels[currentMin] : undefined,
           max: canPan ? labels[currentMin + VISIBLE_POINTS - 1] : undefined,
           ticks: { color: '#c9b97a', maxRotation: 40, font: { size: 12 } },
