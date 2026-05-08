@@ -62,28 +62,28 @@
     },
     {
       "id": 2,
-      "date": "2025-02-26",
+      "date": "2026-02-26",
       "game": "Bear Attack",
       "placements": [
         {
-          "playerId": "maddy",
-          "place": 5
-        },
-        {
-          "playerId": "jack",
-          "place": 4
+          "playerId": "taylor",
+          "place": 1
         },
         {
           "playerId": "autumn",
           "place": 3
         },
         {
-          "playerId": "taylor",
-          "place": 1
-        },
-        {
           "playerId": "walton",
           "place": 2
+        },
+        {
+          "playerId": "jack",
+          "place": 4
+        },
+        {
+          "playerId": "maddy",
+          "place": 5
         }
       ],
       "guests": []
