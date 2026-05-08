@@ -1,19 +1,29 @@
 // ── Configuration ────────────────────────────────────────────────────────────
 // Get a free API key at https://api.imgbb.com/ then replace the value below.
 const IMGBB_KEY  = '31172bd4104090e1b67cdc19a872693d';
+// After deploying worker.js to Cloudflare, replace the URL below.
+const WORKER_URL = 'https://YOUR-WORKER.YOUR-SUBDOMAIN.workers.dev';
 
-const OWNER     = 'walton15';
-const REPO      = 'BoardGameCrewStats';
-const DATA_PATH = 'data/data.json';
-const PAT_KEY   = 'bgcs_pat';
 const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
 
 let currentData    = null;
-let currentSha     = null;
 let selectedPlayer = null;
 let selectedFile   = null;
 
-// ── Boot ─────────────────────────────────────────────────────────────────────
+// ── Worker helper ─────────────────────────────────────────────────────────────
+
+async function workerPost(type, data) {
+  const res  = await fetch(WORKER_URL, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ type, data }),
+  });
+  const json = await res.json();
+  if (!res.ok || json.error) throw new Error(json.error ?? `Worker error ${res.status}`);
+  return json;
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
 
 async function init() {
   if (!IMGBB_KEY || IMGBB_KEY === 'YOUR_IMGBB_API_KEY') {
@@ -32,30 +42,13 @@ async function init() {
 
 async function loadData() {
   try {
-    // Always try the GitHub API first so we get the SHA for commits
-    const token   = localStorage.getItem(PAT_KEY);
-    const headers = { Accept: 'application/vnd.github.v3+json' };
-    if (token) headers['Authorization'] = `token ${token}`;
-
-    const res  = await fetch(
-      `https://api.github.com/repos/${OWNER}/${REPO}/contents/${DATA_PATH}`,
-      { headers }
-    );
-    if (!res.ok) throw new Error(res.status);
-    const json = await res.json();
-    currentSha  = json.sha;
-    currentData = JSON.parse(decodeURIComponent(escape(atob(json.content.replace(/\n/g, '')))));
-  } catch {
-    // Fallback: plain fetch (no SHA, can't commit)
-    try {
-      const res = await fetch(`data/data.json?t=${Date.now()}`);
-      currentData = await res.json();
-    } catch (err) {
-      setStatus(`Could not load player data: ${err.message}`, 'error');
-      return;
-    }
+    const res = await fetch(`data/data.json?t=${Date.now()}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    currentData = await res.json();
+  } catch (err) {
+    setStatus(`Could not load player data: ${err.message}`, 'error');
+    return;
   }
-
   buildPlayerGrid();
 }
 
@@ -181,16 +174,13 @@ async function handleUpload() {
   setStatus('Uploading photo…', 'info');
 
   try {
-    // Convert to base64 and upload to imgbb
+    // Upload image to imgbb
     const base64 = await fileToBase64(selectedFile);
     const form   = new FormData();
     form.append('key', IMGBB_KEY);
     form.append('image', base64);
 
-    const imgRes = await fetch('https://api.imgbb.com/1/upload', {
-      method: 'POST',
-      body: form,
-    });
+    const imgRes  = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: form });
     const imgJson = await imgRes.json();
 
     if (!imgJson.success) throw new Error(imgJson.error?.message ?? 'imgbb upload failed');
@@ -198,7 +188,8 @@ async function handleUpload() {
     const imageUrl = imgJson.data.display_url;
     setStatus('Photo uploaded! Saving to profile…', 'info');
 
-    await saveImageUrl(selectedPlayer.id, imageUrl);
+    // Save URL to data.json via Worker
+    await workerPost('photo', { playerId: selectedPlayer.id, imageUrl });
 
     // Update local state and refresh grid
     selectedPlayer.image = imageUrl;
@@ -217,62 +208,6 @@ async function handleUpload() {
   } finally {
     btn.disabled = false;
   }
-}
-
-async function saveImageUrl(playerId, imageUrl) {
-  const token = localStorage.getItem(PAT_KEY);
-
-  // Re-fetch latest SHA to avoid conflicts
-  const headers = { Accept: 'application/vnd.github.v3+json' };
-  if (token) headers['Authorization'] = `token ${token}`;
-
-  const getRes = await fetch(
-    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${DATA_PATH}`,
-    { headers }
-  );
-  if (!getRes.ok) throw new Error('Could not reach GitHub API — make sure your token is saved on the Add Session page.');
-
-  const getJson   = await getRes.json();
-  currentSha      = getJson.sha;
-  const latestData = JSON.parse(decodeURIComponent(escape(atob(getJson.content.replace(/\n/g, '')))));
-
-  latestData.players = latestData.players.map(p =>
-    p.id === playerId ? { ...p, image: imageUrl } : p
-  );
-
-  const putHeaders = {
-    Accept: 'application/vnd.github.v3+json',
-    'Content-Type': 'application/json',
-  };
-  if (token) putHeaders['Authorization'] = `token ${token}`;
-
-  const content = btoa(unescape(encodeURIComponent(JSON.stringify(latestData, null, 2))));
-  const player  = latestData.players.find(p => p.id === playerId);
-
-  const putRes = await fetch(
-    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${DATA_PATH}`,
-    {
-      method: 'PUT',
-      headers: putHeaders,
-      body: JSON.stringify({
-        message: `Update photo for ${player.name}`,
-        content,
-        sha: currentSha,
-      }),
-    }
-  );
-
-  if (!putRes.ok) {
-    const err = await putRes.json().catch(() => ({}));
-    // 401/403 means no write access — still show the URL
-    if (putRes.status === 401 || putRes.status === 403) {
-      throw new Error('No write access — save your GitHub token on the Add Session page first, then retry.');
-    }
-    throw new Error(err.message || `GitHub API error ${putRes.status}`);
-  }
-
-  currentSha  = (await putRes.json()).content.sha;
-  currentData = latestData;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

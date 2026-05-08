@@ -1,89 +1,31 @@
-const OWNER     = 'walton15';
-const REPO      = 'BoardGameCrewStats';
-const DATA_PATH = 'data/data.json';
-const PAT_KEY   = 'bgcs_pat';
+// ── Configuration ────────────────────────────────────────────────────────────
+// After deploying worker.js to Cloudflare, replace the URL below.
+const WORKER_URL = 'https://YOUR-WORKER.YOUR-SUBDOMAIN.workers.dev';
 
 let currentData = null;
-let currentSha  = null;
 let guestCount  = 0;
 
-// ── Token helpers ────────────────────────────────────────────────────────────
+// ── Worker helper ─────────────────────────────────────────────────────────────
 
-function getToken()       { return localStorage.getItem(PAT_KEY); }
-function saveToken(t)     { localStorage.setItem(PAT_KEY, t); }
-function removeToken()    { localStorage.removeItem(PAT_KEY); }
-
-// ── Auth UI ──────────────────────────────────────────────────────────────────
-
-function updateAuthUI() {
-  const token     = getToken();
-  const inputWrap = document.getElementById('pat-input-wrap');
-  const status    = document.getElementById('auth-status');
-
-  if (token) {
-    inputWrap.style.display = 'none';
-    status.innerHTML = `
-      <span class="connected-status">Connected ✓</span>
-      <button class="btn-link" id="btn-clear-token">Clear Token</button>
-    `;
-    document.getElementById('btn-clear-token')
-      .addEventListener('click', () => { removeToken(); updateAuthUI(); });
-  } else {
-    inputWrap.style.display = 'flex';
-    status.innerHTML = '';
-  }
+async function workerPost(type, data) {
+  const res  = await fetch(WORKER_URL, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ type, data }),
+  });
+  const json = await res.json();
+  if (!res.ok || json.error) throw new Error(json.error ?? `Worker error ${res.status}`);
+  return json;
 }
 
-// ── GitHub API helpers ───────────────────────────────────────────────────────
-
-async function ghGet(token) {
-  const headers = { Accept: 'application/vnd.github.v3+json' };
-  if (token) headers['Authorization'] = `token ${token}`;
-  const res = await fetch(
-    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${DATA_PATH}`,
-    { headers }
-  );
-  if (!res.ok) throw new Error(`GitHub API error ${res.status}`);
-  return res.json();
-}
-
-async function ghPut(token, content, sha, message) {
-  const res = await fetch(
-    `https://api.github.com/repos/${OWNER}/${REPO}/contents/${DATA_PATH}`,
-    {
-      method: 'PUT',
-      headers: {
-        Authorization: `token ${token}`,
-        Accept: 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ message, content, sha }),
-    }
-  );
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || `GitHub API error ${res.status}`);
-  }
-  return res.json();
-}
-
-function jsonToBase64(obj) {
-  const json = JSON.stringify(obj, null, 2);
-  return btoa(unescape(encodeURIComponent(json)));
-}
-
-function base64ToJson(b64) {
-  return JSON.parse(decodeURIComponent(escape(atob(b64.replace(/\n/g, '')))));
-}
-
-// ── Load data ────────────────────────────────────────────────────────────────
+// ── Load data ─────────────────────────────────────────────────────────────────
 
 async function loadData() {
   setStatus('Loading data…', 'info');
   try {
-    const json = await ghGet(getToken());
-    currentSha  = json.sha;
-    currentData = base64ToJson(json.content);
+    const res = await fetch(`data/data.json?t=${Date.now()}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    currentData = await res.json();
     buildPlayerRows(currentData.players);
     populateGameDatalist();
     setStatus('', null);
@@ -103,7 +45,7 @@ function defaultPlayers() {
   ];
 }
 
-// ── Player rows ──────────────────────────────────────────────────────────────
+// ── Player rows ───────────────────────────────────────────────────────────────
 
 function buildPlayerRows(players) {
   const container = document.getElementById('player-rows');
@@ -129,16 +71,16 @@ function buildPlayerRows(players) {
   });
 }
 
-// ── Game datalist ────────────────────────────────────────────────────────────
+// ── Game datalist ─────────────────────────────────────────────────────────────
 
 function populateGameDatalist() {
   if (!currentData) return;
   const list  = document.getElementById('game-suggestions');
   const games = [...new Set(currentData.sessions.map(s => s.game))];
-  list.innerHTML = games.map(g => `<option value="${encodeURIComponent(g)}">`).join('');
+  list.innerHTML = games.map(g => `<option value="${g}">`).join('');
 }
 
-// ── Guests ───────────────────────────────────────────────────────────────────
+// ── Guests ────────────────────────────────────────────────────────────────────
 
 function addGuest() {
   const id  = ++guestCount;
@@ -154,27 +96,19 @@ function addGuest() {
   document.getElementById('guest-entries').appendChild(row);
 }
 
-// ── Status ───────────────────────────────────────────────────────────────────
+// ── Status ────────────────────────────────────────────────────────────────────
 
 function setStatus(msg, type) {
   const el = document.getElementById('submit-status');
   el.textContent = msg;
   el.className = 'status-msg';
-  if (type) {
-    el.classList.add(`status-${type}`, 'visible');
-  }
+  if (type) el.classList.add(`status-${type}`, 'visible');
 }
 
-// ── Submit ───────────────────────────────────────────────────────────────────
+// ── Submit ────────────────────────────────────────────────────────────────────
 
 async function handleSubmit(e) {
   e.preventDefault();
-
-  const token = getToken();
-  if (!token) {
-    setStatus('Enter your GitHub PAT in the bar above first.', 'error');
-    return;
-  }
 
   const date = document.getElementById('session-date').value;
   const game = document.getElementById('session-game').value.trim();
@@ -209,28 +143,7 @@ async function handleSubmit(e) {
   setStatus('Saving…', 'info');
 
   try {
-    // Re-fetch latest SHA to avoid conflicts
-    const latest = await ghGet(token);
-    currentSha  = latest.sha;
-    currentData = base64ToJson(latest.content);
-
-    const nextId = currentData.sessions.length
-      ? Math.max(...currentData.sessions.map(s => s.id)) + 1
-      : 1;
-
-    const newSession = { id: nextId, date, game, placements, guests };
-    const updated = { ...currentData, sessions: [...currentData.sessions, newSession] };
-
-    const result = await ghPut(
-      token,
-      jsonToBase64(updated),
-      currentSha,
-      `Add session: ${game} (${date})`
-    );
-
-    currentSha  = result.content.sha;
-    currentData = updated;
-    populateGameDatalist();
+    await workerPost('session', { date, game, placements, guests });
 
     setStatus(`✓ "${game}" saved successfully!`, 'success');
     document.getElementById('session-form').reset();
@@ -246,29 +159,12 @@ async function handleSubmit(e) {
   }
 }
 
-// ── Init ─────────────────────────────────────────────────────────────────────
+// ── Init ──────────────────────────────────────────────────────────────────────
 
 async function init() {
-  updateAuthUI();
-
   document.getElementById('session-date').valueAsDate = new Date();
-
-  document.getElementById('btn-save-pat').addEventListener('click', () => {
-    const val = document.getElementById('pat-input').value.trim();
-    if (!val) return;
-    saveToken(val);
-    document.getElementById('pat-input').value = '';
-    updateAuthUI();
-    loadData();
-  });
-
-  document.getElementById('pat-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') document.getElementById('btn-save-pat').click();
-  });
-
   document.getElementById('btn-add-guest').addEventListener('click', addGuest);
   document.getElementById('session-form').addEventListener('submit', handleSubmit);
-
   await loadData();
 }
 
