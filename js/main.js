@@ -214,6 +214,7 @@ function renderChart(ranked, sessions) {
       responsive: true,
       maintainAspectRatio: false,
       animation: { duration: 700, easing: 'easeInOutQuart' },
+      layout: { padding: { top: 14, bottom: 4 } },
       interaction: { mode: 'index', intersect: false },
       scales: {
         y: {
