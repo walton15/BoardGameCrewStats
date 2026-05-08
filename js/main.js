@@ -220,7 +220,7 @@ function renderChart(ranked, sessions) {
         y: {
           reverse: true,
           min: 0.5,
-          ticks: { stepSize: 1, callback: v => `#${v}`, color: '#c9b97a', font: { size: 13 } },
+          ticks: { stepSize: 1, callback: v => Number.isInteger(v) ? `#${v}` : null, color: '#c9b97a', font: { size: 13 } },
           grid: { color: 'rgba(201,185,122,0.12)' },
           title: { display: true, text: 'Placement', color: '#c9b97a' },
         },
