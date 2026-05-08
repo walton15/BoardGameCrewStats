@@ -559,7 +559,8 @@ th.sort-desc::after { content: ' ↓'; opacity: 1; color: var(--gold); }
   gap: 0.5rem;
 }
 
-.guest-row td { color: var(--guest); font-style: italic; }
+.guest-row td  { color: var(--guest); font-style: italic; }
+.absent-row td { color: var(--muted); opacity: 0.5; font-style: italic; }
 
 .guest-badge {
   font-family: 'Cinzel', serif;

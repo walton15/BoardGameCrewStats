@@ -320,13 +320,27 @@ function renderSessions(sessions, players) {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
     });
 
+    const presentIds = new Set(s.placements.map(p => p.playerId));
+
     const participants = [
       ...s.placements.map(p => ({
         name: pMap[p.playerId]?.name ?? p.playerId,
-        place: p.place, color: pMap[p.playerId]?.color ?? '#888', isGuest: false,
+        place: p.place, color: pMap[p.playerId]?.color ?? '#888', isGuest: false, isAbsent: false,
       })),
-      ...(s.guests || []).map(g => ({ name: g.name, place: g.place, color: null, isGuest: true })),
+      ...(s.guests || []).map(g => ({ name: g.name, place: g.place, color: null, isGuest: true, isAbsent: false })),
     ].sort((a, b) => a.place - b.place || (a.isGuest ? 1 : -1));
+
+    const absentRows = players
+      .filter(p => !presentIds.has(p.id))
+      .map(p => `
+        <tr class="absent-row">
+          <td class="td-place">💤</td>
+          <td class="td-name">
+            <span class="player-dot" style="background:${p.color}"></span>
+            ${p.name}
+          </td>
+        </tr>
+      `).join('');
 
     const rows = participants.map(p => `
       <tr class="${p.isGuest ? 'guest-row' : ''}">
@@ -348,7 +362,7 @@ function renderSessions(sessions, players) {
           </div>
           <a href="session.html?edit=${s.id}" class="btn-edit-session">Edit</a>
         </div>
-        <table class="session-table"><tbody>${rows}</tbody></table>
+        <table class="session-table"><tbody>${rows}${absentRows}</tbody></table>
       </div>
     `;
   }).join('');
