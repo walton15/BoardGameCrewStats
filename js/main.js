@@ -261,7 +261,7 @@ function renderChart(ranked, sessions) {
   controls.className = 'chart-pan-controls';
   controls.innerHTML = `
     <button type="button" class="chart-arrow" id="chart-prev" aria-label="Pan to earlier sessions">&#8249;</button>
-    <p class="chart-pan-hint">&#8592; Drag or swipe to explore all sessions &#8594;</p>
+    <p class="chart-pan-hint">Use the arrows to explore all sessions</p>
     <button type="button" class="chart-arrow" id="chart-next" aria-label="Pan to later sessions">&#8250;</button>
   `;
   wrap.insertAdjacentElement('afterend', controls);
@@ -288,48 +288,6 @@ function renderChart(ranked, sessions) {
 
   prevBtn.addEventListener('click', () => applyWindow(currentMin - 1, true));
   nextBtn.addEventListener('click', () => applyWindow(currentMin + 1, true));
-
-  // ── Mouse drag ────────────────────────────────────────────────────────────
-  let dragStartX   = null;
-  let dragStartMin = null;
-
-  el.style.cursor = 'grab';
-
-  el.addEventListener('mousedown', e => {
-    if (e.button !== 0) return;
-    dragStartX   = e.clientX;
-    dragStartMin = currentMin;
-    el.style.cursor = 'grabbing';
-    e.preventDefault();
-  });
-
-  el.addEventListener('mousemove', e => {
-    if (dragStartX === null) return;
-    const pixPerLabel = chart.scales.x.width / VISIBLE_POINTS;
-    applyWindow(dragStartMin + (dragStartX - e.clientX) / pixPerLabel);
-  });
-
-  const stopDrag = () => {
-    if (dragStartX === null) return;
-    dragStartX = null;
-    el.style.cursor = 'grab';
-  };
-  el.addEventListener('mouseup',    stopDrag);
-  el.addEventListener('mouseleave', stopDrag);
-
-  // ── Touch swipe (Hammer.js) ───────────────────────────────────────────────
-  if (window.Hammer) {
-    const mc = new Hammer.Manager(el);
-    mc.add(new Hammer.Pan({ direction: Hammer.DIRECTION_HORIZONTAL, threshold: 5 }));
-    let touchStartMin = null;
-    mc.on('panstart', ()  => { touchStartMin = currentMin; });
-    mc.on('panmove',  ev  => {
-      if (touchStartMin === null) return;
-      const pixPerLabel = chart.scales.x.width / VISIBLE_POINTS;
-      applyWindow(touchStartMin - ev.deltaX / pixPerLabel);
-    });
-    mc.on('panend', () => { touchStartMin = null; });
-  }
 
   updatePanUI();
 }
