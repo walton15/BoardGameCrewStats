@@ -99,9 +99,11 @@ function renderRankings(ranked) {
     return `
       <tr class="rank-row rank-tier-${Math.min(rank, 4)}">
         <td class="td-rank">${rank <= 3 ? icons[rank - 1] : `#${rank}`}</td>
-        <td class="td-player">
-          <span class="player-dot" style="background:${p.color}"></span>
-          ${p.name}
+        <td>
+          <div class="td-player">
+            <span class="player-dot" style="background:${p.color}"></span>
+            ${p.name}
+          </div>
         </td>
         <td class="td-avg">${p.avg?.toFixed(2) ?? '—'}</td>
         <td class="td-worst">${p.worst !== null ? `#${p.worst}` : '—'}</td>
