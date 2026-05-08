@@ -383,22 +383,6 @@
         }
       ],
       "guests": []
-    },
-    {
-      "id": 13,
-      "date": "2026-05-08",
-      "game": "Test545",
-      "placements": [
-        {
-          "playerId": "walton",
-          "place": 1
-        },
-        {
-          "playerId": "maddy",
-          "place": 7
-        }
-      ],
-      "guests": []
     }
   ]
 }
