@@ -438,10 +438,7 @@ th.sort-desc::after { content: ' ↓'; opacity: 1; color: var(--gold); }
 
 /* Sessions section header row */
 .section-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  position: relative;
   margin-bottom: 0.35rem;
 }
 
@@ -455,6 +452,10 @@ th.sort-desc::after { content: ' ↓'; opacity: 1; color: var(--gold); }
 }
 
 .btn-add-session {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -466,7 +467,6 @@ th.sort-desc::after { content: ' ↓'; opacity: 1; color: var(--gold); }
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
   transition: background 0.2s, border-color 0.2s;
 }
 .btn-add-session:hover {
