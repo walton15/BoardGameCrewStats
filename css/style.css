@@ -370,7 +370,11 @@ main {
 /* ==========================================
    CHART
    ========================================== */
-.chart-wrap { position: relative; padding: 0.5rem 0; }
+.chart-wrap { position: relative; padding: 0.5rem 0; height: 420px; }
+
+@media (max-width: 600px) {
+  .chart-wrap { height: 260px; }
+}
 
 /* ==========================================
    SESSIONS GRID

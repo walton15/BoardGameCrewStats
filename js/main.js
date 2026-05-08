@@ -137,8 +137,7 @@ function renderChart(ranked, sessions) {
     data: { labels, datasets },
     options: {
       responsive: true,
-      maintainAspectRatio: true,
-      aspectRatio: window.innerWidth < 600 ? 1.4 : 2.5,
+      maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
       scales: {
         y: {
