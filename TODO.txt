@@ -1,0 +1,8 @@
+Board Game API
+double check padding and height for graph
+Remove admin button at the bottom
+Consider making it hosted on a server instead of GitHub api?
+Overall Champions - ties are not working correctly (but they work in Full Rankings)
+Overall Champion - filter by date (year, month, last X amount of time?, etc.)
+I don't see sessions on mobile?
+the plus button for game session needs more padding at the bottom
