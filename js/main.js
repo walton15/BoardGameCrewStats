@@ -252,15 +252,14 @@ function renderChart(ranked, sessions) {
     afterDraw(chart) {
       const xAxis = chart.scales.x;
       const { ctx } = chart;
-      const lineHeight = 15;
       const startY = xAxis.top + 17;
 
       const elapsed  = performance.now() - panAnimStart;
       const progress = easeInOutQuart(Math.min(elapsed / PAN_DURATION, 1));
 
-      const tickWidth = xAxis.width / VISIBLE_POINTS;
-      const halfTick  = tickWidth / 2;
-      const fontSize  = Math.max(8, Math.min(11, tickWidth / 9));
+      const tickWidth  = xAxis.width / VISIBLE_POINTS;
+      const halfTick   = tickWidth / 2;
+      const fontSize   = Math.max(8, Math.min(11, tickWidth / 9));
       const lineHeight = fontSize + 4;
 
       ctx.save();
