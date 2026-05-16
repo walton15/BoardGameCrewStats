@@ -146,24 +146,24 @@
       "game": "Betrayal at House on the Hill",
       "placements": [
         {
-          "playerId": "maddy",
-          "place": 2
-        },
-        {
-          "playerId": "jack",
-          "place": 4
+          "playerId": "taylor",
+          "place": 5
         },
         {
           "playerId": "autumn",
           "place": 3
         },
         {
-          "playerId": "taylor",
-          "place": 5
-        },
-        {
           "playerId": "walton",
           "place": 1
+        },
+        {
+          "playerId": "jack",
+          "place": 4
+        },
+        {
+          "playerId": "maddy",
+          "place": 2
         }
       ],
       "guests": [
@@ -171,7 +171,9 @@
           "name": "Evan",
           "place": 6
         }
-      ]
+      ],
+      "gameImage": "https://cf.geekdo-images.com/lqmt2Oti_qJS65XqHcB8AA__small/img/EDOmDbRhLy4za2PHkJ5IbhNxZmk=/fit-in/200x150/filters:strip_icc()/pic5146864.png",
+      "gameImageFull": "https://cf.geekdo-images.com/lqmt2Oti_qJS65XqHcB8AA__original/img/7R6yYk8A2eUMmSDaxGjae5SceGI=/0x0/filters:format(png)/pic5146864.png"
     },
     {
       "id": 6,
