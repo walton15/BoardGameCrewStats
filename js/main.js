@@ -50,11 +50,10 @@ function calcStats(players, sessions) {
     return a.avg - b.avg;
   });
 
-  // TEMP: force indices 1-4 to tie at rank 2 for visual testing
-  return ranked.map((p, i, arr) => {
+  return ranked.map((p, _, arr) => {
     const rank = p.avg === null
       ? arr.filter(q => q.avg !== null).length + 1
-      : i >= 1 && i <= 4 ? 2 : arr.filter(q => q.avg !== null && q.avg < p.avg).length + 1;
+      : arr.filter(q => q.avg !== null && q.avg < p.avg).length + 1;
     return { ...p, avgRank: rank };
   });
 }
