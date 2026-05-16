@@ -44,10 +44,10 @@ export default {
     try { body = await request.json(); }
     catch { return jsonRes({ error: 'Invalid JSON body' }, 400); }
 
-    const { type, data, env } = body ?? {};
+    const { type, data, env: dataEnv } = body ?? {};
     if (!type || !data) return jsonRes({ error: 'Missing type or data' }, 400);
 
-    const DATA_PATH = env === 'local' ? 'data/data-local.json' : 'data/data.json';
+    const DATA_PATH = dataEnv === 'local' ? 'data/data-local.json' : 'data/data.json';
 
     if (type === 'bgg-proxy') {
       const { url } = data;
@@ -93,7 +93,7 @@ export default {
       const sessionObj = { id: nextId, date, game, placements, guests: guests || [] };
       if (gameImage) sessionObj.gameImage = gameImage;
       fileData.sessions.push(sessionObj);
-      commitMessage = `${env === 'local' ? 'LOCAL: ' : ''}Add session: ${game} (${date})`;
+      commitMessage = `${dataEnv === 'local' ? 'LOCAL: ' : ''}Add session: ${game} (${date})`;
 
     } else if (type === 'update-session') {
       const { id, date, game, gameImage, placements, guests } = data;
@@ -102,7 +102,7 @@ export default {
       const sessionObj = { id, date, game, placements, guests: guests || [] };
       if (gameImage) sessionObj.gameImage = gameImage;
       fileData.sessions[idx] = sessionObj;
-      commitMessage = `${env === 'local' ? 'LOCAL: ' : ''}Update session: ${game} (${date})`;
+      commitMessage = `${dataEnv === 'local' ? 'LOCAL: ' : ''}Update session: ${game} (${date})`;
 
     } else if (type === 'delete-session') {
       const { id } = data;
@@ -110,7 +110,7 @@ export default {
       if (idx === -1) return jsonRes({ error: `Session ${id} not found` }, 404);
       const s = fileData.sessions[idx];
       fileData.sessions.splice(idx, 1);
-      commitMessage = `${env === 'local' ? 'LOCAL: ' : ''}Delete session: ${s.game} (${s.date})`;
+      commitMessage = `${dataEnv === 'local' ? 'LOCAL: ' : ''}Delete session: ${s.game} (${s.date})`;
 
     } else if (type === 'photo') {
       const { playerId, imageUrl } = data;
