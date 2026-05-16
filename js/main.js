@@ -99,19 +99,21 @@ function renderPodium(ranked) {
     const players = byRank[rank];
     const tied = players.length > 1;
 
-    const playerInfos = players.map(p => `
-      <div class="${tied ? 'podium-tied-player' : ''}">
-        <a href="photos.html?player=${p.id}" class="podium-link" title="Update ${p.name}'s photo">
-          <span class="podium-player-name">${p.name}</span>
-          <div class="podium-avatar" style="border-color:${rankColors[rank]}">
-            ${p.image
-              ? `<img src="${p.image}" alt="${p.name}">`
-              : `<span style="color:${p.color}">${p.name[0]}</span>`}
-          </div>
-        </a>
-        <span class="podium-avg">avg&nbsp;${p.avg?.toFixed(2) ?? '—'}</span>
-      </div>
-    `).join('');
+    const playerEntry = p => `
+      <a href="photos.html?player=${p.id}" class="podium-link" title="Update ${p.name}'s photo">
+        <span class="podium-player-name">${p.name}</span>
+        <div class="podium-avatar" style="border-color:${rankColors[rank]}">
+          ${p.image
+            ? `<img src="${p.image}" alt="${p.name}">`
+            : `<span style="color:${p.color}">${p.name[0]}</span>`}
+        </div>
+      </a>
+      <span class="podium-avg">avg&nbsp;${p.avg?.toFixed(2) ?? '—'}</span>
+    `;
+
+    const playerInfos = tied
+      ? players.map(p => `<div class="podium-tied-player">${playerEntry(p)}</div>`).join('')
+      : playerEntry(players[0]);
 
     return `
       <div class="podium-item podium-rank-${rank}${tied ? ' podium-item-tied' : ''}">
