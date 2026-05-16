@@ -454,24 +454,21 @@ th.sort-desc::after { content: ' ↓'; opacity: 1; color: var(--gold); }
 
 /* Sessions section header row */
 .section-title-row {
-  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 0.35rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(201,185,122,0.18);
 }
 
 .section-title-row .section-title {
   margin-bottom: 0;
 }
 .section-title-row .section-title::after { display: none; }
-.section-title-row {
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(201,185,122,0.18);
-}
 
 .btn-add-session {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  flex-shrink: 0;
   width: 32px;
   height: 32px;
   border-radius: 50%;
