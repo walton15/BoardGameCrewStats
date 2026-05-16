@@ -238,22 +238,33 @@ function renderChart(ranked, sessions) {
   let currentMin = canPan ? sorted.length - VISIBLE_POINTS : 0;
   const maxMin   = labels.length - VISIBLE_POINTS;
 
+  const PAN_DURATION = 500;
+  let panAnimStart   = -Infinity;
+  let prevTickMap    = new Map(); // label-key → old x pixel
+  let newLabelShift  = 0;        // pixels new labels are offset from their final x
+
+  function easeInOutQuart(t) {
+    return t < 0.5 ? 8*t*t*t*t : 1 - 8*(1-t)*(1-t)*(1-t)*(1-t);
+  }
+
   const boldTitlePlugin = {
     id: 'boldTitlePlugin',
     afterDraw(chart) {
       const xAxis = chart.scales.x;
       const { ctx } = chart;
       const lineHeight = 15;
-      // axis line is at xAxis.top; tick mark = 8px, padding = 3px, then label center
       const startY = xAxis.top + 17;
 
-      xAxis.ticks.forEach((tick, i) => {
-        const x = xAxis.getPixelForTick(i);
-        if (x < xAxis.left || x > xAxis.right) return;
-        const lines = Array.isArray(tick.label) ? tick.label : [tick.label];
+      const elapsed  = performance.now() - panAnimStart;
+      const progress = easeInOutQuart(Math.min(elapsed / PAN_DURATION, 1));
 
-        ctx.save();
-        ctx.textAlign = 'center';
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(xAxis.left, xAxis.top, xAxis.width, chart.height - xAxis.top);
+      ctx.clip();
+
+      function drawLines(lines, x) {
+        ctx.textAlign    = 'center';
         ctx.textBaseline = 'middle';
         lines.forEach((line, li) => {
           ctx.fillStyle = '#c9b97a';
@@ -262,8 +273,37 @@ function renderChart(ranked, sessions) {
             : 'bold 10px "Cinzel", "Times New Roman", serif';
           ctx.fillText(line, x, startY + li * lineHeight);
         });
-        ctx.restore();
+      }
+
+      const currentValues = new Set(xAxis.ticks.map(t => t.value));
+
+      // Draw exiting labels sliding off screen
+      if (progress < 1) {
+        prevTickMap.forEach(({ x: oldX, lines }, value) => {
+          if (currentValues.has(value)) return;
+          drawLines(lines, oldX - newLabelShift * progress);
+        });
+      }
+
+      // Draw current labels (entering or sliding)
+      xAxis.ticks.forEach((tick, i) => {
+        const finalX = xAxis.getPixelForTick(i);
+        const lines  = Array.isArray(tick.label) ? tick.label : [tick.label];
+
+        let x;
+        if (progress >= 1) {
+          x = finalX;
+        } else if (prevTickMap.has(tick.value)) {
+          const prevX = prevTickMap.get(tick.value).x;
+          x = prevX + (finalX - prevX) * progress;
+        } else {
+          const startX = finalX + newLabelShift;
+          x = startX + (finalX - startX) * progress;
+        }
+
+        drawLines(lines, x);
       });
+      ctx.restore();
     },
   };
 
@@ -274,7 +314,7 @@ function renderChart(ranked, sessions) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      animation: { duration: 700, easing: 'easeInOutQuart' },
+      animation: { duration: PAN_DURATION, easing: 'easeInOutQuart' },
       events: ['click'],
       interaction: { mode: 'index', intersect: false },
       layout: { padding: { right: 36 } },
@@ -377,10 +417,37 @@ function renderChart(ranked, sessions) {
   }
 
   function applyWindow(newMin, animate = false) {
-    currentMin = Math.max(0, Math.min(maxMin, Math.round(newMin)));
+    const targetMin = Math.max(0, Math.min(maxMin, Math.round(newMin)));
+
+    if (!animate || targetMin === currentMin) {
+      currentMin = targetMin;
+      panAnimStart = -Infinity;
+      prevTickMap.clear();
+      chart.options.scales.x.min = labels[currentMin];
+      chart.options.scales.x.max = labels[currentMin + VISIBLE_POINTS - 1];
+      chart.update('none');
+      updatePanUI();
+      return;
+    }
+
+    // Snapshot current tick positions + label text before the scale changes
+    const xAxis = chart.scales.x;
+    prevTickMap.clear();
+    xAxis.ticks.forEach((tick, i) => {
+      const lines = Array.isArray(tick.label) ? tick.label : [tick.label];
+      prevTickMap.set(tick.value, { x: xAxis.getPixelForTick(i), lines });
+    });
+
+    // New labels enter from the opposite direction of the pan
+    const tickWidth   = xAxis.width / VISIBLE_POINTS;
+    const direction   = targetMin > currentMin ? 1 : -1;
+    newLabelShift     = direction * tickWidth;
+
+    currentMin    = targetMin;
+    panAnimStart  = performance.now();
     chart.options.scales.x.min = labels[currentMin];
     chart.options.scales.x.max = labels[currentMin + VISIBLE_POINTS - 1];
-    chart.update(animate ? undefined : 'none');
+    chart.update();
     updatePanUI();
   }
 
