@@ -31,5 +31,101 @@
       "image": null
     }
   ],
-  "sessions": []
+  "sessions": [
+    {
+      "id": 1,
+      "date": "2026-01-29",
+      "game": "Finspan",
+      "placements": [
+        { "playerId": "maddy", "place": 3 },
+        { "playerId": "jack", "place": 1 },
+        { "playerId": "autumn", "place": 4 },
+        { "playerId": "taylor", "place": 2 },
+        { "playerId": "walton", "place": 5 }
+      ],
+      "guests": []
+    },
+    {
+      "id": 2,
+      "date": "2026-02-26",
+      "game": "Bear Attack",
+      "placements": [
+        { "playerId": "taylor", "place": 1 },
+        { "playerId": "autumn", "place": 3 },
+        { "playerId": "walton", "place": 2 },
+        { "playerId": "jack", "place": 4 },
+        { "playerId": "maddy", "place": 5 }
+      ],
+      "guests": []
+    },
+    {
+      "id": 3,
+      "date": "2026-03-19",
+      "game": "Mysterium",
+      "placements": [
+        { "playerId": "maddy", "place": 2 },
+        { "playerId": "jack", "place": 2 },
+        { "playerId": "autumn", "place": 1 },
+        { "playerId": "taylor", "place": 2 },
+        { "playerId": "walton", "place": 2 }
+      ],
+      "guests": []
+    },
+    {
+      "id": 4,
+      "date": "2026-04-07",
+      "game": "One Night Ultimate Werewolf",
+      "placements": [
+        { "playerId": "taylor", "place": 2 },
+        { "playerId": "autumn", "place": 1 },
+        { "playerId": "jack", "place": 2 },
+        { "playerId": "maddy", "place": 4 }
+      ],
+      "guests": []
+    },
+    {
+      "id": 5,
+      "date": "2026-04-23",
+      "game": "Betrayal at House on the Hill",
+      "placements": [
+        { "playerId": "maddy", "place": 2 },
+        { "playerId": "jack", "place": 4 },
+        { "playerId": "autumn", "place": 3 },
+        { "playerId": "taylor", "place": 5 },
+        { "playerId": "walton", "place": 1 }
+      ],
+      "guests": [
+        { "name": "Evan", "place": 6 }
+      ]
+    },
+    {
+      "id": 6,
+      "date": "2026-05-07",
+      "game": "Bang!",
+      "placements": [
+        { "playerId": "maddy", "place": 5 },
+        { "playerId": "jack", "place": 4 },
+        { "playerId": "autumn", "place": 3 },
+        { "playerId": "taylor", "place": 1 },
+        { "playerId": "walton", "place": 1 }
+      ],
+      "guests": []
+    },
+    {
+      "id": 7,
+      "date": "2026-05-16",
+      "game": "Bang",
+      "placements": [
+        { "playerId": "taylor", "place": 1 },
+        { "playerId": "autumn", "place": 2 },
+        { "playerId": "walton", "place": 3 },
+        { "playerId": "jack", "place": 4 },
+        { "playerId": "maddy", "place": 5 }
+      ],
+      "guests": [
+        { "name": "David", "place": 6 }
+      ],
+      "gameImage": "https://cf.geekdo-images.com/0XODRpReiZBFUffEcqT5-Q__small/img/SNVfF23OQafv3u8xdFolJnMkBoM=/fit-in/200x150/filters:strip_icc()/pic9156909.png"
+    }
+  ]
 }
