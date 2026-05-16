@@ -20,7 +20,7 @@
   --rank3:     #c4884a;
 }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scroll-padding-top: 4rem; }
 
 body {
   background-color: var(--bg);
