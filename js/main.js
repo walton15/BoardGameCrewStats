@@ -50,10 +50,11 @@ function calcStats(players, sessions) {
     return a.avg - b.avg;
   });
 
-  return ranked.map((p, _, arr) => {
+  // TEMP: force top 2 players to tie at rank 1 for visual testing
+  return ranked.map((p, i, arr) => {
     const rank = p.avg === null
       ? arr.filter(q => q.avg !== null).length + 1
-      : arr.filter(q => q.avg !== null && q.avg < p.avg).length + 1;
+      : i < 2 ? 1 : arr.filter(q => q.avg !== null && q.avg < p.avg).length + 1;
     return { ...p, avgRank: rank };
   });
 }
@@ -74,19 +75,32 @@ function renderPodium(ranked) {
     return;
   }
 
-  const top = ranked.slice(0, Math.min(3, ranked.length));
-  const order = [];
-  if (top[1]) order.push({ p: top[1], rank: 2 });
-  order.push(       { p: top[0], rank: 1 });
-  if (top[2]) order.push({ p: top[2], rank: 3 });
+  const byRank = {};
+  for (const p of ranked) {
+    if (p.avg === null || p.avgRank > 3) continue;
+    (byRank[p.avgRank] ??= []).push(p);
+  }
+
+  if (!byRank[1]) {
+    el.innerHTML = '<p class="empty-state">No sessions yet — add one via the admin page!</p>';
+    return;
+  }
 
   const heights    = { 1: 140, 2: 100, 3: 75 };
   const medals     = { 1: '🥇', 2: '🥈', 3: '🥉' };
   const rankColors = { 1: 'var(--rank1)', 2: 'var(--rank2)', 3: 'var(--rank3)' };
 
-  el.innerHTML = order.map(({ p, rank }) => `
-    <div class="podium-item podium-rank-${rank}">
-      <div class="podium-info">
+  const order = [];
+  if (byRank[2]) order.push(2);
+  order.push(1);
+  if (byRank[3]) order.push(3);
+
+  el.innerHTML = order.map(rank => {
+    const players = byRank[rank];
+    const tied = players.length > 1;
+
+    const playerInfos = players.map(p => `
+      <div class="${tied ? 'podium-tied-player' : ''}">
         <a href="photos.html?player=${p.id}" class="podium-link" title="Update ${p.name}'s photo">
           <span class="podium-player-name">${p.name}</span>
           <div class="podium-avatar" style="border-color:${rankColors[rank]}">
@@ -97,12 +111,20 @@ function renderPodium(ranked) {
         </a>
         <span class="podium-avg">avg&nbsp;${p.avg?.toFixed(2) ?? '—'}</span>
       </div>
-      <div class="podium-block" style="height:${heights[rank]}px">
-        <span class="podium-medal">${medals[rank]}</span>
-        <span class="podium-num">${rank}</span>
+    `).join('');
+
+    return `
+      <div class="podium-item podium-rank-${rank}${tied ? ' podium-item-tied' : ''}">
+        <div class="podium-info${tied ? ' podium-info-tied' : ''}">
+          ${playerInfos}
+        </div>
+        <div class="podium-block" style="height:${heights[rank]}px">
+          <span class="podium-medal">${medals[rank]}</span>
+          <span class="podium-num">${rank}</span>
+        </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 // ── Rankings table ────────────────────────────────────────────────────────────

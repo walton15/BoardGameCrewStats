@@ -380,6 +380,22 @@ th.sort-desc::after { content: ' ↓'; opacity: 1; color: var(--gold); }
 .podium-link:hover .podium-player-name { color: var(--gold); }
 .podium-link:hover .podium-avatar { box-shadow: 0 0 10px rgba(201,185,122,0.4); }
 
+.podium-item-tied { max-width: 320px; }
+
+.podium-info-tied {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.podium-tied-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+}
+
 /* Player name link in rankings */
 .player-photo-link {
   color: inherit;
