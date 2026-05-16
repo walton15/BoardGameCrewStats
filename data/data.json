@@ -200,6 +200,40 @@
         }
       ],
       "guests": []
+    },
+    {
+      "id": 7,
+      "date": "2026-05-16",
+      "game": "Catan",
+      "placements": [
+        {
+          "playerId": "taylor",
+          "place": 1
+        },
+        {
+          "playerId": "autumn",
+          "place": 2
+        },
+        {
+          "playerId": "walton",
+          "place": 3
+        },
+        {
+          "playerId": "jack",
+          "place": 4
+        },
+        {
+          "playerId": "maddy",
+          "place": 5
+        }
+      ],
+      "guests": [
+        {
+          "name": "David",
+          "place": 6
+        }
+      ],
+      "gameImage": "https://cf.geekdo-images.com/0XODRpReiZBFUffEcqT5-Q__small/img/SNVfF23OQafv3u8xdFolJnMkBoM=/fit-in/200x150/filters:strip_icc()/pic9156909.png"
     }
   ]
 }
