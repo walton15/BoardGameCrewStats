@@ -48,6 +48,21 @@ export default {
     const { type, data } = body ?? {};
     if (!type || !data) return jsonRes({ error: 'Missing type or data' }, 400);
 
+    if (type === 'bgg-proxy') {
+      const { url } = data;
+      if (!url.startsWith('https://boardgamegeek.com/xmlapi2/')) {
+        return jsonRes({ error: 'Only BGG API URLs allowed' }, 400);
+      }
+      const bggFetch = () => fetch(url, { headers: { 'User-Agent': 'BoardGameCrewStats-Worker' } });
+      let bggRes = await bggFetch();
+      if (bggRes.status === 202) {
+        await new Promise(r => setTimeout(r, 2000));
+        bggRes = await bggFetch();
+      }
+      const text = await bggRes.text();
+      return new Response(text, { status: bggRes.status, headers: { ...CORS, 'Content-Type': 'text/xml' } });
+    }
+
     const ghHeaders = {
       Accept:        'application/vnd.github.v3+json',
       Authorization: `token ${env.GITHUB_PAT}`,
@@ -70,18 +85,22 @@ export default {
     let commitMessage;
 
     if (type === 'session') {
-      const { date, game, placements, guests } = data;
+      const { date, game, gameImage, placements, guests } = data;
       const nextId = fileData.sessions.length
         ? Math.max(...fileData.sessions.map(s => s.id)) + 1
         : 1;
-      fileData.sessions.push({ id: nextId, date, game, placements, guests: guests || [] });
+      const sessionObj = { id: nextId, date, game, placements, guests: guests || [] };
+      if (gameImage) sessionObj.gameImage = gameImage;
+      fileData.sessions.push(sessionObj);
       commitMessage = `Add session: ${game} (${date})`;
 
     } else if (type === 'update-session') {
-      const { id, date, game, placements, guests } = data;
+      const { id, date, game, gameImage, placements, guests } = data;
       const idx = fileData.sessions.findIndex(s => s.id === id);
       if (idx === -1) return jsonRes({ error: `Session ${id} not found` }, 404);
-      fileData.sessions[idx] = { id, date, game, placements, guests: guests || [] };
+      const sessionObj = { id, date, game, placements, guests: guests || [] };
+      if (gameImage) sessionObj.gameImage = gameImage;
+      fileData.sessions[idx] = sessionObj;
       commitMessage = `Update session: ${game} (${date})`;
 
     } else if (type === 'delete-session') {

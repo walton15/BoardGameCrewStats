@@ -34,17 +34,24 @@
 
         <div class="form-field">
           <label for="session-game">Game</label>
-          <input
-            type="text"
-            id="session-game"
-            class="form-input"
-            placeholder="e.g. Catan"
-            required
-            aria-required="true"
-            list="game-suggestions"
-            autocomplete="off"
-          >
-          <datalist id="game-suggestions"></datalist>
+          <div class="bgg-game-field">
+            <input
+              type="text"
+              id="session-game"
+              class="form-input"
+              placeholder="e.g. Catan"
+              required
+              aria-required="true"
+              autocomplete="off"
+            >
+            <datalist id="game-suggestions"></datalist>
+            <div id="bgg-results" class="bgg-dropdown" hidden></div>
+          </div>
+          <div id="game-image-preview" class="game-image-preview" hidden>
+            <img id="game-image-thumb" src="" alt="Game cover">
+            <button type="button" id="btn-clear-image" class="btn-clear-image" aria-label="Remove image">✕</button>
+          </div>
+          <input type="hidden" id="game-image-url">
         </div>
       </div>
 

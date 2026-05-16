@@ -20,6 +20,98 @@ async function workerPost(type, data) {
   return json;
 }
 
+// ── BGG search ────────────────────────────────────────────────────────────────
+
+async function bggProxy(url) {
+  const res = await fetch(WORKER_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'bgg-proxy', data: { url } }),
+  });
+  const text = await res.text();
+  return new DOMParser().parseFromString(text, 'text/xml');
+}
+
+function hideBggDropdown() {
+  document.getElementById('bgg-results').hidden = true;
+}
+
+async function searchBGG(query) {
+  const dropdown = document.getElementById('bgg-results');
+  try {
+    const xml = await bggProxy(
+      `https://boardgamegeek.com/xmlapi2/search?query=${encodeURIComponent(query)}&type=boardgame`
+    );
+    const items = [...xml.querySelectorAll('item')].slice(0, 5);
+    if (!items.length) { dropdown.hidden = true; return; }
+
+    dropdown.innerHTML = items.map(item => {
+      const id   = item.getAttribute('id');
+      const name = item.querySelector('name[type="primary"]')?.getAttribute('value') ?? '?';
+      const year = item.querySelector('yearpublished')?.getAttribute('value') ?? '';
+      return `
+        <div class="bgg-result" data-id="${id}" data-name="${name.replace(/"/g, '&quot;')}">
+          <span class="bgg-result-name">${name}</span>
+          ${year ? `<span class="bgg-year">(${year})</span>` : ''}
+        </div>
+      `;
+    }).join('');
+
+    dropdown.querySelectorAll('.bgg-result').forEach(el => {
+      el.addEventListener('click', () => selectBGGGame(el.dataset.id, el.dataset.name));
+    });
+    dropdown.hidden = false;
+  } catch {
+    dropdown.hidden = true;
+  }
+}
+
+async function selectBGGGame(id, name) {
+  document.getElementById('session-game').value = name;
+  hideBggDropdown();
+
+  try {
+    const xml = await bggProxy(
+      `https://boardgamegeek.com/xmlapi2/thing?id=${id}&type=boardgame`
+    );
+    const thumbnail = xml.querySelector('thumbnail')?.textContent?.trim();
+    if (thumbnail) {
+      document.getElementById('game-image-url').value = thumbnail;
+      document.getElementById('game-image-thumb').src = thumbnail;
+      document.getElementById('game-image-preview').hidden = false;
+    }
+  } catch {
+    // image fetch failed — silently continue without image
+  }
+}
+
+function initBGGSearch() {
+  const gameInput = document.getElementById('session-game');
+  const dropdown  = document.getElementById('bgg-results');
+  let debounce;
+
+  gameInput.addEventListener('input', () => {
+    clearTimeout(debounce);
+    const q = gameInput.value.trim();
+    if (q.length < 2) { hideBggDropdown(); return; }
+    debounce = setTimeout(() => searchBGG(q), 500);
+  });
+
+  document.addEventListener('click', e => {
+    if (!dropdown.contains(e.target) && e.target !== gameInput) hideBggDropdown();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') hideBggDropdown();
+  });
+
+  document.getElementById('btn-clear-image').addEventListener('click', () => {
+    document.getElementById('game-image-url').value = '';
+    document.getElementById('game-image-thumb').src = '';
+    document.getElementById('game-image-preview').hidden = true;
+  });
+}
+
 // ── Load data ─────────────────────────────────────────────────────────────────
 
 async function loadData() {
@@ -91,6 +183,12 @@ function populateEditForm() {
 
   document.getElementById('session-date').value = session.date;
   document.getElementById('session-game').value = session.game;
+
+  if (session.gameImage) {
+    document.getElementById('game-image-url').value = session.gameImage;
+    document.getElementById('game-image-thumb').src = session.gameImage;
+    document.getElementById('game-image-preview').hidden = false;
+  }
 
   document.querySelectorAll('#player-rows .player-placement-row').forEach(row => {
     const placement   = session.placements.find(p => p.playerId === row.dataset.playerId);
@@ -184,8 +282,9 @@ function initDeleteSection() {
 async function handleSubmit(e) {
   e.preventDefault();
 
-  const date = document.getElementById('session-date').value;
-  const game = document.getElementById('session-game').value.trim();
+  const date      = document.getElementById('session-date').value;
+  const game      = document.getElementById('session-game').value.trim();
+  const gameImage = document.getElementById('game-image-url').value || null;
 
   if (!date || !game) {
     setStatus('Date and game name are required.', 'error');
@@ -219,13 +318,16 @@ async function handleSubmit(e) {
 
   try {
     if (editId) {
-      await workerPost('update-session', { id: editId, date, game, placements, guests });
+      await workerPost('update-session', { id: editId, date, game, gameImage, placements, guests });
       setStatus(`✓ Session updated successfully!`, 'success');
     } else {
-      await workerPost('session', { date, game, placements, guests });
+      await workerPost('session', { date, game, gameImage, placements, guests });
       setStatus(`✓ "${game}" saved successfully!`, 'success');
       document.getElementById('session-form').reset();
       document.getElementById('guest-entries').innerHTML = '';
+      document.getElementById('game-image-url').value = '';
+      document.getElementById('game-image-preview').hidden = true;
+      hideBggDropdown();
       guestCount = 0;
       document.getElementById('session-date').valueAsDate = new Date();
       document.querySelectorAll('.place-input').forEach(i => { i.disabled = false; });
@@ -252,6 +354,7 @@ async function init() {
   await loadData();
   if (editId) populateEditForm();
   initDeleteSection();
+  initBGGSearch();
 }
 
 init();
