@@ -100,6 +100,11 @@ function initBGGSearch() {
     debounce = setTimeout(() => searchBGG(q), 500);
   });
 
+  gameInput.addEventListener('focus', () => {
+    const q = gameInput.value.trim();
+    if (q.length >= 2) searchBGG(q);
+  });
+
   document.addEventListener('click', e => {
     if (!dropdown.contains(e.target) && e.target !== gameInput) hideBggDropdown();
   });

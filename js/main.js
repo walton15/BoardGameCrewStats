@@ -436,12 +436,14 @@ function renderSessions(sessions, players) {
       </tr>
     `).join('');
 
+    const bgImage   = s.gameImageFull || s.gameImage;
+    const cardStyle = bgImage ? ` style="--game-bg:url('${bgImage}')"` : '';
     const thumbHtml = s.gameImage
       ? `<img class="session-game-thumb" src="${s.gameImage}" alt="${s.game}">`
       : '🎲';
 
     return `
-      <div class="session-card">
+      <div class="session-card"${cardStyle}>
         <div class="session-head">
           <div>
             <div class="session-game">${thumbHtml} ${s.game}</div>

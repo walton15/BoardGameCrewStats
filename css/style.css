@@ -516,11 +516,22 @@ th.sort-desc::after { content: ' ↓'; opacity: 1; color: var(--gold); }
 }
 
 .session-card {
+  position: relative;
   background: rgba(0,0,0,0.22);
   border: 1px solid var(--border);
   border-radius: 8px;
   overflow: hidden;
   transition: border-color 0.2s;
+}
+
+.session-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--game-bg) center / cover no-repeat;
+  opacity: 0.07;
+  pointer-events: none;
+  border-radius: inherit;
 }
 
 .session-game-thumb {
@@ -530,13 +541,14 @@ th.sort-desc::after { content: ' ↓'; opacity: 1; color: var(--gold); }
   border-radius: 5px;
   border: 1px solid rgba(201,185,122,0.25);
   flex-shrink: 0;
+  margin-right: 0.4rem;
 }
 
 .session-card:hover { border-color: rgba(201,185,122,0.5); }
 
 .session-head {
   background: rgba(201,185,122,0.07);
-  padding: 0.8rem 1.1rem;
+  padding: 0.8rem;
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;

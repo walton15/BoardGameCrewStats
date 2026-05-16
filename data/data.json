@@ -38,27 +38,29 @@
       "game": "Finspan",
       "placements": [
         {
-          "playerId": "maddy",
-          "place": 3
-        },
-        {
-          "playerId": "jack",
-          "place": 1
+          "playerId": "taylor",
+          "place": 2
         },
         {
           "playerId": "autumn",
           "place": 4
         },
         {
-          "playerId": "taylor",
-          "place": 2
-        },
-        {
           "playerId": "walton",
           "place": 5
+        },
+        {
+          "playerId": "jack",
+          "place": 1
+        },
+        {
+          "playerId": "maddy",
+          "place": 3
         }
       ],
-      "guests": []
+      "guests": [],
+      "gameImage": "https://cf.geekdo-images.com/BBefMnVYBDS3EbJ9fPaC8A__small/img/Wo2snzBQJMaVXkFdYl-zXL8PrbA=/fit-in/200x150/filters:strip_icc()/pic8634453.jpg",
+      "gameImageFull": "https://cf.geekdo-images.com/BBefMnVYBDS3EbJ9fPaC8A__original/img/E2VsUBa6HUU0QKlp4eQOsbP1wUo=/0x0/filters:format(jpeg)/pic8634453.jpg"
     },
     {
       "id": 2,
@@ -86,7 +88,9 @@
           "place": 5
         }
       ],
-      "guests": []
+      "guests": [],
+      "gameImage": "https://cf.geekdo-images.com/nRuVPalUqCGOVorHuNtuQA__small/img/vP7IwDvtJYm9ALWwl67J-x6P56E=/fit-in/200x150/filters:strip_icc()/pic6669460.jpg",
+      "gameImageFull": "https://cf.geekdo-images.com/nRuVPalUqCGOVorHuNtuQA__original/img/o9RjgmUtiKpyMI0chpoQPjHOLCM=/0x0/filters:format(jpeg)/pic6669460.jpg"
     },
     {
       "id": 3,
@@ -94,11 +98,7 @@
       "game": "Mysterium",
       "placements": [
         {
-          "playerId": "maddy",
-          "place": 2
-        },
-        {
-          "playerId": "jack",
+          "playerId": "taylor",
           "place": 2
         },
         {
@@ -106,15 +106,21 @@
           "place": 1
         },
         {
-          "playerId": "taylor",
+          "playerId": "walton",
           "place": 2
         },
         {
-          "playerId": "walton",
+          "playerId": "jack",
+          "place": 2
+        },
+        {
+          "playerId": "maddy",
           "place": 2
         }
       ],
-      "guests": []
+      "guests": [],
+      "gameImage": "https://cf.geekdo-images.com/1nQ3ZKudtDeAP7IiKE-kNg__small/img/sW38512N2r1ZuuPE2TUD2LNfoxM=/fit-in/200x150/filters:strip_icc()/pic8625343.jpg",
+      "gameImageFull": "https://cf.geekdo-images.com/1nQ3ZKudtDeAP7IiKE-kNg__original/img/6igmXolQesapNU9yEnexip6m9B8=/0x0/filters:format(jpeg)/pic8625343.jpg"
     },
     {
       "id": 4,
@@ -138,7 +144,9 @@
           "place": 4
         }
       ],
-      "guests": []
+      "guests": [],
+      "gameImage": "https://cf.geekdo-images.com/rqLju4uaZq-G9z4g91aPPQ__small/img/viW0s_SZmeEo53dKbM84WbVjIaY=/fit-in/200x150/filters:strip_icc()/pic8783294.png",
+      "gameImageFull": "https://cf.geekdo-images.com/rqLju4uaZq-G9z4g91aPPQ__original/img/eOxUlbCuix0lOjuyBYpjtIXVihc=/0x0/filters:format(png)/pic8783294.png"
     },
     {
       "id": 5,
@@ -146,24 +154,24 @@
       "game": "Betrayal at House on the Hill",
       "placements": [
         {
-          "playerId": "maddy",
-          "place": 2
-        },
-        {
-          "playerId": "jack",
-          "place": 4
+          "playerId": "taylor",
+          "place": 5
         },
         {
           "playerId": "autumn",
           "place": 3
         },
         {
-          "playerId": "taylor",
-          "place": 5
-        },
-        {
           "playerId": "walton",
           "place": 1
+        },
+        {
+          "playerId": "jack",
+          "place": 4
+        },
+        {
+          "playerId": "maddy",
+          "place": 2
         }
       ],
       "guests": [
@@ -171,7 +179,9 @@
           "name": "Evan",
           "place": 6
         }
-      ]
+      ],
+      "gameImage": "https://cf.geekdo-images.com/lqmt2Oti_qJS65XqHcB8AA__small/img/EDOmDbRhLy4za2PHkJ5IbhNxZmk=/fit-in/200x150/filters:strip_icc()/pic5146864.png",
+      "gameImageFull": "https://cf.geekdo-images.com/lqmt2Oti_qJS65XqHcB8AA__original/img/7R6yYk8A2eUMmSDaxGjae5SceGI=/0x0/filters:format(png)/pic5146864.png"
     },
     {
       "id": 6,
