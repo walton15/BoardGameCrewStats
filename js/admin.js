@@ -43,7 +43,7 @@ async function searchBGG(query) {
     const xml = await bggProxy(
       `https://boardgamegeek.com/xmlapi2/search?query=${encodeURIComponent(query)}&type=boardgame`
     );
-    const items = [...xml.querySelectorAll('item')].slice(0, 5);
+    const items = [...xml.querySelectorAll('item')].slice(0, 10);
     if (!items.length) { dropdown.hidden = true; return; }
 
     dropdown.innerHTML = items.map(item => {
@@ -76,9 +76,11 @@ async function selectBGGGame(id, name) {
       `https://boardgamegeek.com/xmlapi2/thing?id=${id}&type=boardgame`
     );
     const thumbnail = xml.querySelector('thumbnail')?.textContent?.trim();
+    const fullImage = xml.querySelector('image')?.textContent?.trim();
     if (thumbnail) {
-      document.getElementById('game-image-url').value = thumbnail;
-      document.getElementById('game-image-thumb').src = thumbnail;
+      document.getElementById('game-image-url').value      = thumbnail;
+      document.getElementById('game-image-full-url').value = fullImage || thumbnail;
+      document.getElementById('game-image-thumb').src      = thumbnail;
       document.getElementById('game-image-preview').hidden = false;
     }
   } catch {
@@ -107,8 +109,9 @@ function initBGGSearch() {
   });
 
   document.getElementById('btn-clear-image').addEventListener('click', () => {
-    document.getElementById('game-image-url').value = '';
-    document.getElementById('game-image-thumb').src = '';
+    document.getElementById('game-image-url').value      = '';
+    document.getElementById('game-image-full-url').value = '';
+    document.getElementById('game-image-thumb').src      = '';
     document.getElementById('game-image-preview').hidden = true;
   });
 }
@@ -186,8 +189,9 @@ function populateEditForm() {
   document.getElementById('session-game').value = session.game;
 
   if (session.gameImage) {
-    document.getElementById('game-image-url').value = session.gameImage;
-    document.getElementById('game-image-thumb').src = session.gameImage;
+    document.getElementById('game-image-url').value      = session.gameImage;
+    document.getElementById('game-image-full-url').value = session.gameImageFull || session.gameImage;
+    document.getElementById('game-image-thumb').src      = session.gameImage;
     document.getElementById('game-image-preview').hidden = false;
   }
 
@@ -285,7 +289,8 @@ async function handleSubmit(e) {
 
   const date      = document.getElementById('session-date').value;
   const game      = document.getElementById('session-game').value.trim();
-  const gameImage = document.getElementById('game-image-url').value || null;
+  const gameImage     = document.getElementById('game-image-url').value || null;
+  const gameImageFull = document.getElementById('game-image-full-url').value || null;
 
   if (!date || !game) {
     setStatus('Date and game name are required.', 'error');
@@ -319,14 +324,15 @@ async function handleSubmit(e) {
 
   try {
     if (editId) {
-      await workerPost('update-session', { id: editId, date, game, gameImage, placements, guests });
+      await workerPost('update-session', { id: editId, date, game, gameImage, gameImageFull, placements, guests });
       setStatus(`✓ Session updated successfully!`, 'success');
     } else {
-      await workerPost('session', { date, game, gameImage, placements, guests });
+      await workerPost('session', { date, game, gameImage, gameImageFull, placements, guests });
       setStatus(`✓ "${game}" saved successfully!`, 'success');
       document.getElementById('session-form').reset();
       document.getElementById('guest-entries').innerHTML = '';
-      document.getElementById('game-image-url').value = '';
+      document.getElementById('game-image-url').value      = '';
+      document.getElementById('game-image-full-url').value = '';
       document.getElementById('game-image-preview').hidden = true;
       hideBggDropdown();
       guestCount = 0;
