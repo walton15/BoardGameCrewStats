@@ -235,9 +235,39 @@ function renderChart(ranked, sessions) {
   let currentMin = canPan ? sorted.length - VISIBLE_POINTS : 0;
   const maxMin   = labels.length - VISIBLE_POINTS;
 
+  const boldTitlePlugin = {
+    id: 'boldTitlePlugin',
+    afterDraw(chart) {
+      const xAxis = chart.scales.x;
+      const { ctx } = chart;
+      const items = xAxis._labelItems;
+      if (!items) return;
+      items.forEach(item => {
+        if (item.x < xAxis.left || item.x > xAxis.right) return;
+        const lines = Array.isArray(item.label) ? item.label : [item.label];
+        const lineHeight = 15;
+        const startY = (item.textBaseline === 'middle')
+          ? item.y - ((lines.length - 1) * lineHeight) / 2
+          : item.y;
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        lines.forEach((line, i) => {
+          ctx.fillStyle = '#c9b97a';
+          ctx.font = (i === lines.length - 1)
+            ? '400 12px "Crimson Text", Georgia, serif'
+            : 'bold 12px "Cinzel", "Times New Roman", serif';
+          ctx.fillText(line, item.x, startY + i * lineHeight);
+        });
+        ctx.restore();
+      });
+    },
+  };
+
   const chart = new Chart(el.getContext('2d'), {
     type: 'line',
     data: { labels, datasets },
+    plugins: [boldTitlePlugin],
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -258,7 +288,7 @@ function renderChart(ranked, sessions) {
           min: canPan ? labels[currentMin] : undefined,
           max: canPan ? labels[currentMin + VISIBLE_POINTS - 1] : undefined,
           ticks: {
-            color: '#c9b97a',
+            color: 'transparent',
             maxRotation: 0,
             minRotation: 0,
             font: { size: 12 },
