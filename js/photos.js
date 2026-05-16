@@ -42,7 +42,7 @@ async function init() {
 
 async function loadData() {
   try {
-    const res = await fetch(`data/data.json?t=${Date.now()}`);
+    const res = await fetch(`${WORKER_URL}?env=prod`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     currentData = await res.json();
   } catch (err) {

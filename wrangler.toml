@@ -1,3 +1,7 @@
 name = "board-game-crew-stats"
 main = "worker.js"
 compatibility_date = "2024-09-23"
+
+[[kv_namespaces]]
+binding = "DATA_KV"
+id = "bc91d23a90e2490cae395cf541edf027"

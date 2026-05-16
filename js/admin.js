@@ -126,7 +126,7 @@ function initBGGSearch() {
 async function loadData() {
   setStatus('Loading data…', 'info');
   try {
-    const res = await fetch(`${IS_LOCAL ? 'data/data-local.json' : 'data/data.json'}?t=${Date.now()}`);
+    const res = await fetch(`${WORKER_URL}?env=${IS_LOCAL ? 'local' : 'prod'}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     currentData = await res.json();
     buildPlayerRows(currentData.players);

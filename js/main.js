@@ -1,4 +1,5 @@
-const IS_LOCAL = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+const IS_LOCAL   = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+const WORKER_URL = 'https://board-game-crew-stats.moseleywalton.workers.dev';
 
 // ── Sort state ───────────────────────────────────────────────────────────────
 
@@ -17,7 +18,7 @@ const SORT_DEFAULTS = {
 // ── Data ─────────────────────────────────────────────────────────────────────
 
 async function loadData() {
-  const res = await fetch(`${IS_LOCAL ? 'data/data-local.json' : 'data/data.json'}?t=${Date.now()}`);
+  const res = await fetch(`${WORKER_URL}?env=${IS_LOCAL ? 'local' : 'prod'}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
@@ -257,8 +258,8 @@ function renderChart(ranked, sessions) {
         lines.forEach((line, li) => {
           ctx.fillStyle = '#c9b97a';
           ctx.font = (li === lines.length - 1)
-            ? '400 12px "Crimson Text", Georgia, serif'
-            : 'bold 12px "Cinzel", "Times New Roman", serif';
+            ? '400 10px "Crimson Text", Georgia, serif'
+            : 'bold 10px "Cinzel", "Times New Roman", serif';
           ctx.fillText(line, x, startY + li * lineHeight);
         });
         ctx.restore();
@@ -293,6 +294,7 @@ function renderChart(ranked, sessions) {
             color: 'transparent',
             maxRotation: 0,
             minRotation: 0,
+            autoSkip: false,
             font: { size: 12 },
             callback: function(value) {
               const label = this.getLabelForValue(value);
