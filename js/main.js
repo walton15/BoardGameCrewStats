@@ -258,9 +258,10 @@ function renderChart(ranked, sessions) {
       const elapsed  = performance.now() - panAnimStart;
       const progress = easeInOutQuart(Math.min(elapsed / PAN_DURATION, 1));
 
+      const halfTick = xAxis.width / (2 * VISIBLE_POINTS);
       ctx.save();
       ctx.beginPath();
-      ctx.rect(xAxis.left, xAxis.top, xAxis.width, chart.height - xAxis.top);
+      ctx.rect(xAxis.left - halfTick, xAxis.top, xAxis.width + halfTick * 2, chart.height - xAxis.top);
       ctx.clip();
 
       function drawLines(lines, x) {
