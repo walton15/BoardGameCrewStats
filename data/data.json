@@ -155,11 +155,11 @@
       "placements": [
         {
           "playerId": "taylor",
-          "place": 5
+          "place": 1
         },
         {
           "playerId": "autumn",
-          "place": 3
+          "place": 1
         },
         {
           "playerId": "walton",
@@ -167,11 +167,11 @@
         },
         {
           "playerId": "jack",
-          "place": 4
+          "place": 1
         },
         {
           "playerId": "maddy",
-          "place": 2
+          "place": 1
         }
       ],
       "guests": [
