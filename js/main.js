@@ -50,11 +50,11 @@ function calcStats(players, sessions) {
     return a.avg - b.avg;
   });
 
-  // TEMP: force top 2 players to tie at rank 1 for visual testing
+  // TEMP: force 2nd and 3rd players to tie at rank 2 for visual testing
   return ranked.map((p, i, arr) => {
     const rank = p.avg === null
       ? arr.filter(q => q.avg !== null).length + 1
-      : i < 2 ? 1 : arr.filter(q => q.avg !== null && q.avg < p.avg).length + 1;
+      : i === 1 || i === 2 ? 2 : arr.filter(q => q.avg !== null && q.avg < p.avg).length + 1;
     return { ...p, avgRank: rank };
   });
 }
