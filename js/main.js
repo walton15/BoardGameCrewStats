@@ -244,16 +244,17 @@ function renderChart(ranked, sessions) {
       animation: { duration: 700, easing: 'easeInOutQuart' },
       events: ['click'],
       interaction: { mode: 'index', intersect: false },
+      layout: { padding: { right: 36 } },
       scales: {
         y: {
-          afterFit: scale => { scale.width = 56; },
+          afterFit: scale => { scale.width = 36; },
           reverse: true,
           min: 0.5,
           ticks: { stepSize: 1, callback: v => Number.isInteger(v) ? `#${v}` : null, color: '#c9b97a', font: { size: 13 } },
           grid: { color: 'rgba(201,185,122,0.12)' },
         },
         x: {
-          afterFit: scale => { scale.paddingLeft = 8; scale.paddingRight = 16; },
+          afterFit: scale => { scale.paddingLeft = 8; scale.paddingRight = 8; },
           min: canPan ? labels[currentMin] : undefined,
           max: canPan ? labels[currentMin + VISIBLE_POINTS - 1] : undefined,
           ticks: { color: '#c9b97a', maxRotation: 40, font: { size: 12 } },
