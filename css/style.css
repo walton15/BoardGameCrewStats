@@ -1283,8 +1283,11 @@ footer {
 
   .sessions-grid { grid-template-columns: 1fr; }
 
-  .rankings-table th,
-  .rankings-table td { padding: 0.6rem 0.6rem; }
+  .rankings-table { font-size: 0.82rem; }
+  .rankings-table th { padding: 0.5rem 0.4rem; }
+  .rankings-table td { padding: 0.6rem 0.4rem; }
+  .td-rank { min-width: 32px; }
+  .td-player { gap: 0.35rem; }
 }
 
 @media (max-width: 380px) {

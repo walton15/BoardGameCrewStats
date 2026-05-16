@@ -258,7 +258,11 @@ function renderChart(ranked, sessions) {
       const elapsed  = performance.now() - panAnimStart;
       const progress = easeInOutQuart(Math.min(elapsed / PAN_DURATION, 1));
 
-      const halfTick = xAxis.width / (2 * VISIBLE_POINTS);
+      const tickWidth = xAxis.width / VISIBLE_POINTS;
+      const halfTick  = tickWidth / 2;
+      const fontSize  = Math.max(8, Math.min(11, tickWidth / 9));
+      const lineHeight = fontSize + 4;
+
       ctx.save();
       ctx.beginPath();
       ctx.rect(xAxis.left - halfTick, xAxis.top, xAxis.width + halfTick * 2, chart.height - xAxis.top);
@@ -270,8 +274,8 @@ function renderChart(ranked, sessions) {
         lines.forEach((line, li) => {
           ctx.fillStyle = '#c9b97a';
           ctx.font = (li === lines.length - 1)
-            ? '400 10px "Crimson Text", Georgia, serif'
-            : 'bold 10px "Cinzel", "Times New Roman", serif';
+            ? `400 ${fontSize}px "Crimson Text", Georgia, serif`
+            : `bold ${fontSize}px "Cinzel", "Times New Roman", serif`;
           ctx.fillText(line, x, startY + li * lineHeight);
         });
       }
