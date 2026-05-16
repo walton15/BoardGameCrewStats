@@ -200,40 +200,6 @@
         }
       ],
       "guests": []
-    },
-    {
-      "id": 7,
-      "date": "2026-05-16",
-      "game": "Betrayal at House on the Hill",
-      "placements": [
-        {
-          "playerId": "taylor",
-          "place": 1
-        },
-        {
-          "playerId": "autumn",
-          "place": 2
-        },
-        {
-          "playerId": "walton",
-          "place": 3
-        },
-        {
-          "playerId": "jack",
-          "place": 4
-        },
-        {
-          "playerId": "maddy",
-          "place": 5
-        }
-      ],
-      "guests": [
-        {
-          "name": "David",
-          "place": 6
-        }
-      ],
-      "gameImage": "https://cf.geekdo-images.com/lqmt2Oti_qJS65XqHcB8AA__small/img/EDOmDbRhLy4za2PHkJ5IbhNxZmk=/fit-in/200x150/filters:strip_icc()/pic5146864.png"
     }
   ]
 }
