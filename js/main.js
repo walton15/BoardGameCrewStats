@@ -240,24 +240,24 @@ function renderChart(ranked, sessions) {
     afterDraw(chart) {
       const xAxis = chart.scales.x;
       const { ctx } = chart;
-      const items = xAxis._labelItems;
-      if (!items) return;
-      items.forEach(item => {
-        if (item.x < xAxis.left || item.x > xAxis.right) return;
-        const lines = Array.isArray(item.label) ? item.label : [item.label];
-        const lineHeight = 15;
-        const startY = (item.textBaseline === 'middle')
-          ? item.y - ((lines.length - 1) * lineHeight) / 2
-          : item.y;
+      const lineHeight = 15;
+      // axis line is at xAxis.top; tick mark = 8px, padding = 3px, then label center
+      const startY = xAxis.top + 17;
+
+      xAxis.ticks.forEach((tick, i) => {
+        const x = xAxis.getPixelForTick(i);
+        if (x < xAxis.left || x > xAxis.right) return;
+        const lines = Array.isArray(tick.label) ? tick.label : [tick.label];
+
         ctx.save();
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        lines.forEach((line, i) => {
+        lines.forEach((line, li) => {
           ctx.fillStyle = '#c9b97a';
-          ctx.font = (i === lines.length - 1)
+          ctx.font = (li === lines.length - 1)
             ? '400 12px "Crimson Text", Georgia, serif'
             : 'bold 12px "Cinzel", "Times New Roman", serif';
-          ctx.fillText(line, item.x, startY + i * lineHeight);
+          ctx.fillText(line, x, startY + li * lineHeight);
         });
         ctx.restore();
       });
