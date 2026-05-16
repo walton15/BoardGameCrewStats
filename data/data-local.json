@@ -1,0 +1,35 @@
+{
+  "players": [
+    {
+      "id": "taylor",
+      "name": "Taylor",
+      "color": "#e8534a",
+      "image": "https://i.ibb.co/N65WcxBF/0317100a1098.jpg"
+    },
+    {
+      "id": "autumn",
+      "name": "Autumn",
+      "color": "#e8962a",
+      "image": "https://i.ibb.co/gM9kbs7N/ac39f74791bf.jpg"
+    },
+    {
+      "id": "walton",
+      "name": "Walton",
+      "color": "#4a90d9",
+      "image": "https://i.ibb.co/Zpyqpwhk/5c9777a62cb0.jpg"
+    },
+    {
+      "id": "jack",
+      "name": "Jack",
+      "color": "#3dba7a",
+      "image": null
+    },
+    {
+      "id": "maddy",
+      "name": "Maddy",
+      "color": "#9b59b6",
+      "image": null
+    }
+  ],
+  "sessions": []
+}

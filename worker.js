@@ -7,9 +7,8 @@
 //   3. `wrangler secret put GITHUB_PAT`  (paste a fine-grained PAT with Contents read+write)
 //   4. Copy the deployed URL into WORKER_URL in js/admin.js and js/photos.js
 
-const OWNER     = 'walton15';
-const REPO      = 'BoardGameCrewStats';
-const DATA_PATH = 'data/data.json';
+const OWNER = 'walton15';
+const REPO  = 'BoardGameCrewStats';
 
 const CORS = {
   'Access-Control-Allow-Origin':  '*',
@@ -45,15 +44,17 @@ export default {
     try { body = await request.json(); }
     catch { return jsonRes({ error: 'Invalid JSON body' }, 400); }
 
-    const { type, data } = body ?? {};
+    const { type, data, env } = body ?? {};
     if (!type || !data) return jsonRes({ error: 'Missing type or data' }, 400);
+
+    const DATA_PATH = env === 'local' ? 'data/data-local.json' : 'data/data.json';
 
     if (type === 'bgg-proxy') {
       const { url } = data;
       if (!url.startsWith('https://boardgamegeek.com/xmlapi2/')) {
         return jsonRes({ error: 'Only BGG API URLs allowed' }, 400);
       }
-      const bggFetch = () => fetch(url, { headers: { 'User-Agent': 'BoardGameCrewStats-Worker' } });
+      const bggFetch = () => fetch(url, { headers: { 'User-Agent': 'BoardGameCrewStats-Worker', 'Authorization': `Bearer ${env.BGG_TOKEN}` } });
       let bggRes = await bggFetch();
       if (bggRes.status === 202) {
         await new Promise(r => setTimeout(r, 2000));
@@ -92,7 +93,7 @@ export default {
       const sessionObj = { id: nextId, date, game, placements, guests: guests || [] };
       if (gameImage) sessionObj.gameImage = gameImage;
       fileData.sessions.push(sessionObj);
-      commitMessage = `Add session: ${game} (${date})`;
+      commitMessage = `${env === 'local' ? 'LOCAL: ' : ''}Add session: ${game} (${date})`;
 
     } else if (type === 'update-session') {
       const { id, date, game, gameImage, placements, guests } = data;
@@ -101,7 +102,7 @@ export default {
       const sessionObj = { id, date, game, placements, guests: guests || [] };
       if (gameImage) sessionObj.gameImage = gameImage;
       fileData.sessions[idx] = sessionObj;
-      commitMessage = `Update session: ${game} (${date})`;
+      commitMessage = `${env === 'local' ? 'LOCAL: ' : ''}Update session: ${game} (${date})`;
 
     } else if (type === 'delete-session') {
       const { id } = data;
@@ -109,7 +110,7 @@ export default {
       if (idx === -1) return jsonRes({ error: `Session ${id} not found` }, 404);
       const s = fileData.sessions[idx];
       fileData.sessions.splice(idx, 1);
-      commitMessage = `Delete session: ${s.game} (${s.date})`;
+      commitMessage = `${env === 'local' ? 'LOCAL: ' : ''}Delete session: ${s.game} (${s.date})`;
 
     } else if (type === 'photo') {
       const { playerId, imageUrl } = data;

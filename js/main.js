@@ -1,3 +1,5 @@
+const IS_LOCAL = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+
 // ── Sort state ───────────────────────────────────────────────────────────────
 
 let rankingData = [];
@@ -15,7 +17,7 @@ const SORT_DEFAULTS = {
 // ── Data ─────────────────────────────────────────────────────────────────────
 
 async function loadData() {
-  const res = await fetch(`data/data.json?t=${Date.now()}`);
+  const res = await fetch(`${IS_LOCAL ? 'data/data-local.json' : 'data/data.json'}?t=${Date.now()}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }

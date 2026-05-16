@@ -1,5 +1,6 @@
 // ── Configuration ────────────────────────────────────────────────────────────
 const WORKER_URL = 'https://board-game-crew-stats.moseleywalton.workers.dev';
+const IS_LOCAL   = ['localhost', '127.0.0.1'].includes(window.location.hostname);
 
 const editParam = new URLSearchParams(window.location.search).get('edit');
 const editId    = editParam ? Number(editParam) : null;
@@ -13,7 +14,7 @@ async function workerPost(type, data) {
   const res  = await fetch(WORKER_URL, {
     method:  'POST',
     headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify({ type, data }),
+    body:    JSON.stringify({ type, data, env: IS_LOCAL ? 'local' : 'production' }),
   });
   const json = await res.json();
   if (!res.ok || json.error) throw new Error(json.error ?? `Worker error ${res.status}`);
@@ -117,7 +118,7 @@ function initBGGSearch() {
 async function loadData() {
   setStatus('Loading data…', 'info');
   try {
-    const res = await fetch(`data/data.json?t=${Date.now()}`);
+    const res = await fetch(`${IS_LOCAL ? 'data/data-local.json' : 'data/data.json'}?t=${Date.now()}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     currentData = await res.json();
     buildPlayerRows(currentData.players);
@@ -342,6 +343,13 @@ async function handleSubmit(e) {
 // ── Init ──────────────────────────────────────────────────────────────────────
 
 async function init() {
+  if (IS_LOCAL) {
+    const banner = document.createElement('div');
+    banner.className = 'local-env-banner';
+    banner.textContent = '⚠ Local Environment — data saved to data-local.json';
+    document.querySelector('.admin-main').prepend(banner);
+  }
+
   if (editId) {
     document.querySelector('.admin-title').textContent = '🎲 Edit Session';
     document.getElementById('btn-submit').textContent = 'Save Changes';
