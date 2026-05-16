@@ -257,7 +257,34 @@ function renderChart(ranked, sessions) {
           afterFit: scale => { scale.paddingLeft = 8; scale.paddingRight = 8; },
           min: canPan ? labels[currentMin] : undefined,
           max: canPan ? labels[currentMin + VISIBLE_POINTS - 1] : undefined,
-          ticks: { color: '#c9b97a', maxRotation: 40, font: { size: 12 } },
+          ticks: {
+            color: '#c9b97a',
+            maxRotation: 0,
+            minRotation: 0,
+            font: { size: 12 },
+            callback: function(value) {
+              const label = this.getLabelForValue(value);
+              const parenIdx = label.lastIndexOf(' (');
+              if (parenIdx === -1) return label;
+              const game = label.slice(0, parenIdx);
+              const date = label.slice(parenIdx + 1);
+              const maxChars = 14;
+              const words = game.split(' ');
+              const lines = [];
+              let line = '';
+              for (const word of words) {
+                const test = line ? `${line} ${word}` : word;
+                if (test.length <= maxChars) {
+                  line = test;
+                } else {
+                  if (line) lines.push(line);
+                  line = word;
+                }
+              }
+              if (line) lines.push(line);
+              return [...lines, date];
+            },
+          },
           grid: { color: 'rgba(201,185,122,0.08)' },
         },
       },
