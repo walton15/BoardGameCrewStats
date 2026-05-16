@@ -204,7 +204,7 @@
     {
       "id": 7,
       "date": "2026-05-16",
-      "game": "Catan",
+      "game": "Bang",
       "placements": [
         {
           "playerId": "taylor",
@@ -232,7 +232,8 @@
           "name": "David",
           "place": 6
         }
-      ]
+      ],
+      "gameImage": "https://cf.geekdo-images.com/0XODRpReiZBFUffEcqT5-Q__small/img/SNVfF23OQafv3u8xdFolJnMkBoM=/fit-in/200x150/filters:strip_icc()/pic9156909.png"
     }
   ]
 }
