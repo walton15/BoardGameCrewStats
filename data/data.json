@@ -137,17 +137,17 @@
         },
         {
           "playerId": "jack",
-          "place": 2
+          "place": 4
         },
         {
           "playerId": "maddy",
-          "place": 5
+          "place": 2
         }
       ],
       "guests": [
         {
           "name": "Katie",
-          "place": 4
+          "place": 3
         }
       ],
       "gameImage": "https://cf.geekdo-images.com/rqLju4uaZq-G9z4g91aPPQ__small/img/viW0s_SZmeEo53dKbM84WbVjIaY=/fit-in/200x150/filters:strip_icc()/pic8783294.png",
