@@ -430,6 +430,14 @@
       "date": "2026-05-23",
       "game": "TestGame2",
       "guests": []
+    },
+    {
+      "id": 16,
+      "date": "2026-05-23",
+      "game": "Action Test",
+      "guests": [],
+      "gameImage": "https://cf.geekdo-images.com/NhRkTsLyf2d6JDaXQavZAA__small/img/3gDTY4s9pYSpAAVgzGyEbjX7ylo=/fit-in/200x150/filters:strip_icc()/pic679176.jpg",
+      "gameImageFull": "https://cf.geekdo-images.com/NhRkTsLyf2d6JDaXQavZAA__original/img/J0Buib3DWVUPHax4W595Jl1-8Mk=/0x0/filters:format(jpeg)/pic679176.jpg"
     }
   ]
 }
