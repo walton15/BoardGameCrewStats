@@ -424,6 +424,12 @@
       "date": "2026-05-23",
       "game": "TestGame",
       "guests": []
+    },
+    {
+      "id": 15,
+      "date": "2026-05-23",
+      "game": "TestGame2",
+      "guests": []
     }
   ]
 }
