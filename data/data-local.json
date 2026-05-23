@@ -216,61 +216,10 @@
     {
       "id": 7,
       "date": "2026-05-23",
-      "game": "Action Test",
-      "rounds": [
-        {
-          "placements": [
-            {
-              "playerId": "taylor",
-              "place": 1
-            },
-            {
-              "playerId": "autumn",
-              "place": 2
-            },
-            {
-              "playerId": "walton",
-              "place": 3
-            },
-            {
-              "playerId": "jack",
-              "place": 4
-            },
-            {
-              "playerId": "maddy",
-              "place": 5
-            }
-          ],
-          "guests": []
-        },
-        {
-          "placements": [
-            {
-              "playerId": "taylor",
-              "place": 5
-            },
-            {
-              "playerId": "autumn",
-              "place": 4
-            },
-            {
-              "playerId": "walton",
-              "place": 3
-            },
-            {
-              "playerId": "jack",
-              "place": 2
-            },
-            {
-              "playerId": "maddy",
-              "place": 1
-            }
-          ],
-          "guests": []
-        }
-      ],
-      "gameImage": "https://cf.geekdo-images.com/NhRkTsLyf2d6JDaXQavZAA__small/img/3gDTY4s9pYSpAAVgzGyEbjX7ylo=/fit-in/200x150/filters:strip_icc()/pic679176.jpg",
-      "gameImageFull": "https://cf.geekdo-images.com/NhRkTsLyf2d6JDaXQavZAA__original/img/J0Buib3DWVUPHax4W595Jl1-8Mk=/0x0/filters:format(jpeg)/pic679176.jpg"
+      "game": "Bang!",
+      "guests": [],
+      "gameImage": "https://cf.geekdo-images.com/zf2v5Wz_XwuXatG4eZ-CCQ__small/img/7QECQfPbaqjNTnCDKh2eCft8pPU=/fit-in/200x150/filters:strip_icc()/pic1559111.png",
+      "gameImageFull": "https://cf.geekdo-images.com/zf2v5Wz_XwuXatG4eZ-CCQ__original/img/BaJB6XVF6XoR22f5A-I04g2uzUk=/0x0/filters:format(png)/pic1559111.png"
     }
   ]
 }
