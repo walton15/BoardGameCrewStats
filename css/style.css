@@ -629,6 +629,21 @@ footer {
   margin-bottom: 0.5rem;
 }
 
+.bgg-attribution {
+  display: inline-block;
+  margin-top: 1rem;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+
+.bgg-attribution:hover { opacity: 1; }
+
+.bgg-attribution img {
+  height: 40px;
+  width: auto;
+  display: block;
+}
+
 /* ==========================================
    ADMIN — HEADER
    ========================================== */
