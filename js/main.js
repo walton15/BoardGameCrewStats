@@ -576,6 +576,11 @@ function renderSessions(sessions, players) {
       }),
     ].sort((a, b) => a.avg - b.avg || (a.isGuest ? 1 : -1));
 
+    // Assign display ranks by sort position (competition ranking: ties share a rank, next skips)
+    summaryParticipants.forEach((p, i) => {
+      p.rank = (i === 0 || p.avg !== summaryParticipants[i - 1].avg) ? i + 1 : summaryParticipants[i - 1].rank;
+    });
+
     const absentRows = players
       .filter(p => !allPlayerIds.has(p.id))
       .map(p => `
@@ -589,7 +594,7 @@ function renderSessions(sessions, players) {
       `).join('');
 
     const summaryRows = summaryParticipants.map(p => {
-      const placeDisplay = placeIcon(Math.round(p.avg));
+      const placeDisplay = placeIcon(p.rank);
       return `
         <tr class="${p.isGuest ? 'guest-row' : ''}">
           <td class="td-place">${placeDisplay}</td>
