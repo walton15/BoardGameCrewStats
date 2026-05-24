@@ -1389,38 +1389,52 @@ footer {
 
 /* ── Multi-round session cards (main page) ───────────────────────────────────── */
 
-.session-rounds-badge {
-  display: inline-flex;
-  align-items: center;
-  font-family: 'Cinzel', serif;
-  font-size: 0.58rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  border: 1px solid rgba(201,185,122,0.35);
+.session-rounds-btn {
+  background: rgba(201,185,122,0.1);
+  border: 1px solid rgba(201,185,122,0.4);
+  border-radius: 50%;
   color: var(--gold);
-  padding: 0.1rem 0.35rem;
-  border-radius: 3px;
-  text-transform: uppercase;
-  flex-shrink: 0;
-}
-
-.session-toggle-btn {
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--muted);
   cursor: pointer;
   width: 28px;
   height: 28px;
-  font-size: 1.1rem;
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  transition: color 0.2s, border-color 0.2s;
   flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s;
 }
-.session-toggle-btn:hover { color: var(--gold); border-color: rgba(201,185,122,0.45); }
+.session-rounds-btn:hover { background: rgba(201,185,122,0.22); border-color: var(--gold); }
+.session-rounds-btn[aria-expanded="true"] { background: rgba(201,185,122,0.18); border-color: var(--gold); }
+
+/* Stacked card effect for multi-round sessions */
+.session-card-wrapper {
+  position: relative;
+}
+
+.session-card-wrapper::before,
+.session-card-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(201,185,122,0.12);
+  border-radius: 8px;
+  z-index: -1;
+}
+
+.session-card-wrapper::before {
+  transform: rotate(1.3deg) translate(5px, 5px);
+  opacity: 0.8;
+}
+
+.session-card-wrapper::after {
+  transform: rotate(-1deg) translate(-4px, 9px);
+  opacity: 0.55;
+}
 
 .session-rounds-detail { padding: 0 0.5rem 0.75rem; }
 .session-rounds-detail[hidden] { display: none; }

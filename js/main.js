@@ -499,9 +499,8 @@ function renderSessions(sessions, players) {
       ? `<img class="session-game-thumb" src="${s.gameImage}" alt="${s.game}">`
       : '🎲';
 
-    const badgeHtml  = isMultiRound ? `<span class="session-rounds-badge">${rounds.length} rounds</span>` : '';
     const toggleHtml = isMultiRound
-      ? `<button type="button" class="session-toggle-btn" data-session-id="${s.id}" aria-expanded="false" aria-label="Expand rounds">&#8964;</button>`
+      ? `<button type="button" class="session-rounds-btn" data-session-id="${s.id}" aria-expanded="false" aria-label="Show ${rounds.length} rounds">${rounds.length}</button>`
       : '';
 
     // Compute per-player average placements across all rounds
@@ -534,9 +533,7 @@ function renderSessions(sessions, players) {
       `).join('');
 
     const summaryRows = summaryParticipants.map(p => {
-      const placeDisplay = isMultiRound
-        ? (p.avg % 1 === 0 ? `avg ${p.avg.toFixed(0)}` : `avg ${p.avg.toFixed(2)}`)
-        : placeIcon(p.avg);
+      const placeDisplay = placeIcon(Math.round(p.avg));
       return `
         <tr class="${p.isGuest ? 'guest-row' : ''}">
           <td class="td-place">${placeDisplay}</td>
@@ -580,11 +577,11 @@ function renderSessions(sessions, players) {
       </div>
     ` : '';
 
-    return `
+    const cardHtml = `
       <div class="session-card"${cardStyle}>
         <div class="session-head">
           <div>
-            <div class="session-game">${thumbHtml} ${s.game} ${badgeHtml}</div>
+            <div class="session-game">${thumbHtml} ${s.game}</div>
             <div class="session-date">${dateStr}</div>
           </div>
           <div style="display:flex;align-items:center;gap:0.5rem;">
@@ -596,18 +593,18 @@ function renderSessions(sessions, players) {
         ${roundDetailHtml}
       </div>
     `;
+    return isMultiRound ? `<div class="session-card-wrapper">${cardHtml}</div>` : cardHtml;
   }).join('');
 
   // Expand/collapse round detail via event delegation
   container.addEventListener('click', e => {
-    const btn = e.target.closest('.session-toggle-btn');
+    const btn = e.target.closest('.session-rounds-btn');
     if (!btn) return;
     const sid    = btn.dataset.sessionId;
     const detail = document.getElementById(`rounds-detail-${sid}`);
     if (!detail) return;
     const expanded = btn.getAttribute('aria-expanded') === 'true';
     btn.setAttribute('aria-expanded', String(!expanded));
-    btn.innerHTML  = expanded ? '&#8964;' : '&#8963;';
     detail.hidden  = expanded;
   });
 }
