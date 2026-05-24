@@ -157,32 +157,57 @@
       "id": 5,
       "date": "2026-04-23",
       "game": "Betrayal at House on the Hill",
-      "placements": [
+      "rounds": [
         {
-          "playerId": "taylor",
-          "place": 1
-        },
-        {
-          "playerId": "autumn",
-          "place": 1
-        },
-        {
-          "playerId": "walton",
-          "place": 1
-        },
-        {
-          "playerId": "jack",
-          "place": 1
-        },
-        {
-          "playerId": "maddy",
-          "place": 1
-        }
-      ],
-      "guests": [
-        {
-          "name": "Evan",
-          "place": 6
+          "isTeam": true,
+          "teams": [
+            {
+              "place": 1,
+              "playerIds": [
+                "taylor",
+                "autumn",
+                "walton",
+                "jack",
+                "maddy"
+              ],
+              "guestNames": []
+            },
+            {
+              "place": 6,
+              "playerIds": [],
+              "guestNames": [
+                "Evan"
+              ]
+            }
+          ],
+          "placements": [
+            {
+              "playerId": "taylor",
+              "place": 1
+            },
+            {
+              "playerId": "autumn",
+              "place": 1
+            },
+            {
+              "playerId": "walton",
+              "place": 1
+            },
+            {
+              "playerId": "jack",
+              "place": 1
+            },
+            {
+              "playerId": "maddy",
+              "place": 1
+            }
+          ],
+          "guests": [
+            {
+              "name": "Evan",
+              "place": 6
+            }
+          ]
         }
       ],
       "gameImage": "https://cf.geekdo-images.com/lqmt2Oti_qJS65XqHcB8AA__small/img/EDOmDbRhLy4za2PHkJ5IbhNxZmk=/fit-in/200x150/filters:strip_icc()/pic5146864.png",
