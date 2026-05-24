@@ -811,22 +811,22 @@ function renderTeamStats(stats, players) {
   const cards = [
     {
       key: 'bestTeammates', mod: 'best',
-      emoji: '🤝', label: 'Best Teammates', sub: 'Win the most together',
+      emoji: '🤝', label: 'Best Teammates', sub: 'Highest win rate as teammates',
       kind: 'pair',
     },
     {
       key: 'worstTeammates', mod: 'worst',
-      emoji: '💔', label: 'Worst Teammates', sub: "Can't find the magic",
+      emoji: '💔', label: 'Worst Teammates', sub: 'Lowest win rate as teammates',
       kind: 'pair',
     },
     {
       key: 'bestAgainst', mod: 'bully',
-      emoji: '😈', label: 'Biggest Bully', sub: 'Owns this matchup',
+      emoji: '😈', label: 'Biggest Bully', sub: 'Highest win rate against a specific opponent',
       kind: 'vs',
     },
     {
       key: 'worstAgainst', mod: 'kryptonite',
-      emoji: '☠️', label: 'Kryptonite', sub: "Just can't win this one",
+      emoji: '☠️', label: 'Kryptonite', sub: 'Lowest win rate against a specific opponent',
       kind: 'vs',
     },
   ];
