@@ -306,7 +306,12 @@
               "place": 4
             }
           ],
-          "guests": []
+          "guests": [
+            {
+              "name": "Carl",
+              "place": 1
+            }
+          ]
         }
       ],
       "gameImage": "https://cf.geekdo-images.com/rAQ3hIXoH6xDcj41v9iqCg__small/img/xA2T7PiwN3Z8pwAksicoCOA1tf0=/fit-in/200x150/filters:strip_icc()/pic5164305.jpg",
