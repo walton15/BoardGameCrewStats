@@ -554,11 +554,6 @@ function renderSessions(sessions, players) {
       ? `<img class="session-game-thumb" src="${s.gameImage}" alt="${s.game}">`
       : '🎲';
 
-    const toggleHtml = isMultiRound
-      ? `<button type="button" class="session-rounds-btn" data-session-id="${s.id}" aria-expanded="false" aria-label="Show ${rounds.length} rounds">${rounds.length}</button>`
-      : '';
-
-
     // Compute per-player average placements across all rounds
     const allPlayerIds  = new Set(rounds.flatMap(r => r.placements.map(p => p.playerId)));
     const allGuestNames = [...new Set(rounds.flatMap(r => (r.guests || []).map(g => g.name)))];
@@ -607,38 +602,50 @@ function renderSessions(sessions, players) {
       `;
     }).join('');
 
-    // Per-round detail tables (multi-round only, hidden by default)
-    const roundDetailHtml = isMultiRound ? `
-      <div class="session-rounds-detail" id="rounds-detail-${s.id}" hidden>
-        ${rounds.map((round, idx) => {
-          const roundParticipants = [
-            ...round.placements.map(p => ({
-              key: p.playerId,
-              name: pMap[p.playerId]?.name ?? p.playerId,
-              place: p.place, color: pMap[p.playerId]?.color ?? '#888', isGuest: false,
-            })),
-            ...(round.guests || []).map(g => ({ key: `guest:${g.name}`, name: g.name, place: g.place, color: null, isGuest: true })),
-          ].sort((a, b) => a.place - b.place || (a.isGuest ? 1 : -1));
+    // Build carousel panels for multi-round sessions
+    const bodyHtml = isMultiRound ? (() => {
+      const panelLabels = ['Overall', ...rounds.map((_, i) => `Round ${i + 1}`)];
 
-          const roundRows = roundParticipants.map(p => `
-            <tr class="${p.isGuest ? 'guest-row' : ''}">
-              <td class="td-place">${placeIcon(p.place)}</td>
-              <td class="td-name">
-                ${!p.isGuest ? `<span class="player-dot" style="background:${p.color}"></span>` : ''}
-                ${p.name}
-                ${p.isGuest ? '<span class="guest-badge">Guest</span>' : ''}
-              </td>
-            </tr>
-          `).join('');
+      const overallPanel = `
+        <div class="carousel-panel" data-panel="0">
+          <table class="session-table"><tbody>${summaryRows}${absentRows}</tbody></table>
+        </div>`;
 
-          const headerLabel = `Round ${idx + 1}`;
-          return `
-            <div class="session-round-header">${headerLabel}</div>
-            <table class="session-table"><tbody>${roundRows}</tbody></table>
-          `;
-        }).join('')}
-      </div>
-    ` : '';
+      const roundPanels = rounds.map((round, idx) => {
+        const roundParticipants = [
+          ...round.placements.map(p => ({
+            name: pMap[p.playerId]?.name ?? p.playerId,
+            place: p.place, color: pMap[p.playerId]?.color ?? '#888', isGuest: false,
+          })),
+          ...(round.guests || []).map(g => ({ name: g.name, place: g.place, color: null, isGuest: true })),
+        ].sort((a, b) => a.place - b.place || (a.isGuest ? 1 : -1));
+
+        const roundRows = roundParticipants.map(p => `
+          <tr class="${p.isGuest ? 'guest-row' : ''}">
+            <td class="td-place">${placeIcon(p.place)}</td>
+            <td class="td-name">
+              ${!p.isGuest ? `<span class="player-dot" style="background:${p.color}"></span>` : ''}
+              ${p.name}
+              ${p.isGuest ? '<span class="guest-badge">Guest</span>' : ''}
+            </td>
+          </tr>`).join('');
+
+        return `
+        <div class="carousel-panel" data-panel="${idx + 1}" hidden>
+          <table class="session-table"><tbody>${roundRows}</tbody></table>
+        </div>`;
+      }).join('');
+
+      return `
+        <div class="session-carousel" data-slide="0" data-count="${panelLabels.length}">
+          <div class="session-carousel-nav">
+            <button class="carousel-btn carousel-prev" aria-label="Previous">&#8249;</button>
+            <span class="carousel-label">${panelLabels[0]}</span>
+            <button class="carousel-btn carousel-next" aria-label="Next">&#8250;</button>
+          </div>
+          ${overallPanel}${roundPanels}
+        </div>`;
+    })() : `<table class="session-table"><tbody>${summaryRows}${absentRows}</tbody></table>`;
 
     const cardHtml = `
       <div class="session-card"${cardStyle}>
@@ -647,28 +654,31 @@ function renderSessions(sessions, players) {
             <div class="session-game">${thumbHtml} ${s.game}</div>
             <div class="session-date">${dateStr}</div>
           </div>
-          <div style="display:flex;align-items:center;gap:0.5rem;">
-            ${toggleHtml}
-            <a href="session.html?edit=${s.id}" class="btn-edit-session">Edit</a>
-          </div>
+          <a href="session.html?edit=${s.id}" class="btn-edit-session">Edit</a>
         </div>
-        <table class="session-table"><tbody>${summaryRows}${absentRows}</tbody></table>
-        ${roundDetailHtml}
+        ${bodyHtml}
       </div>
     `;
     return isMultiRound ? `<div class="session-card-wrapper">${cardHtml}</div>` : cardHtml;
   }).join('');
 
-  // Expand/collapse round detail via event delegation
+  // Carousel navigation via event delegation
   container.addEventListener('click', e => {
-    const btn = e.target.closest('.session-rounds-btn');
+    const btn = e.target.closest('.carousel-prev, .carousel-next');
     if (!btn) return;
-    const sid    = btn.dataset.sessionId;
-    const detail = document.getElementById(`rounds-detail-${sid}`);
-    if (!detail) return;
-    const expanded = btn.getAttribute('aria-expanded') === 'true';
-    btn.setAttribute('aria-expanded', String(!expanded));
-    detail.hidden  = expanded;
+    const carousel = btn.closest('.session-carousel');
+    if (!carousel) return;
+    const count = parseInt(carousel.dataset.count, 10);
+    let slide = parseInt(carousel.dataset.slide, 10);
+    slide = btn.classList.contains('carousel-next')
+      ? (slide + 1) % count
+      : (slide - 1 + count) % count;
+    carousel.querySelectorAll('.carousel-panel').forEach(p => {
+      p.hidden = parseInt(p.dataset.panel, 10) !== slide;
+    });
+    const labels = ['Overall', ...Array.from({ length: count - 1 }, (_, i) => `Round ${i + 1}`)];
+    carousel.querySelector('.carousel-label').textContent = labels[slide];
+    carousel.dataset.slide = slide;
   });
 }
 
