@@ -1489,13 +1489,15 @@ footer {
 
 .session-head-right {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: space-between;
+  align-items: center;
   align-self: stretch;
+  position: relative;
 }
 
 .carousel-cycle-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
   background: none;
   border: none;
   padding: 0;
