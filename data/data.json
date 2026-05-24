@@ -217,6 +217,105 @@
       "guests": [],
       "gameImage": "https://cf.geekdo-images.com/_04xA-d-rfygm0c49HE4vA__small/img/P-6cf4TEk7ewzrfP9d-8c-TxAY4=/fit-in/200x150/filters:strip_icc()/pic1170986.jpg",
       "gameImageFull": "https://cf.geekdo-images.com/_04xA-d-rfygm0c49HE4vA__original/img/el-4Ilu9DeYunRT3r4TVP8Vy3uk=/0x0/filters:format(jpeg)/pic1170986.jpg"
+    },
+    {
+      "id": 7,
+      "date": "2026-05-19",
+      "game": "Secret Hitler",
+      "rounds": [
+        {
+          "placements": [
+            {
+              "playerId": "taylor",
+              "place": 1
+            },
+            {
+              "playerId": "autumn",
+              "place": 1
+            },
+            {
+              "playerId": "walton",
+              "place": 5
+            },
+            {
+              "playerId": "jack",
+              "place": 5
+            },
+            {
+              "playerId": "maddy",
+              "place": 1
+            }
+          ],
+          "guests": [
+            {
+              "name": "Carl",
+              "place": 1
+            }
+          ]
+        },
+        {
+          "placements": [
+            {
+              "playerId": "taylor",
+              "place": 1
+            },
+            {
+              "playerId": "autumn",
+              "place": 1
+            },
+            {
+              "playerId": "walton",
+              "place": 5
+            },
+            {
+              "playerId": "jack",
+              "place": 5
+            },
+            {
+              "playerId": "maddy",
+              "place": 1
+            }
+          ],
+          "guests": [
+            {
+              "name": "Carl",
+              "place": 1
+            }
+          ]
+        },
+        {
+          "placements": [
+            {
+              "playerId": "taylor",
+              "place": 4
+            },
+            {
+              "playerId": "autumn",
+              "place": 4
+            },
+            {
+              "playerId": "walton",
+              "place": 1
+            },
+            {
+              "playerId": "jack",
+              "place": 1
+            },
+            {
+              "playerId": "maddy",
+              "place": 4
+            }
+          ],
+          "guests": [
+            {
+              "name": "Carl",
+              "place": 1
+            }
+          ]
+        }
+      ],
+      "gameImage": "https://cf.geekdo-images.com/rAQ3hIXoH6xDcj41v9iqCg__small/img/xA2T7PiwN3Z8pwAksicoCOA1tf0=/fit-in/200x150/filters:strip_icc()/pic5164305.jpg",
+      "gameImageFull": "https://cf.geekdo-images.com/rAQ3hIXoH6xDcj41v9iqCg__original/img/7oKwNUYakx3-vHUBLHWVuFNKfl4=/0x0/filters:format(jpeg)/pic5164305.jpg"
     }
   ]
 }
