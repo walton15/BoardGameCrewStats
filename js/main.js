@@ -824,11 +824,6 @@ function renderTeamStats(stats, players) {
       emoji: '😈', label: 'Biggest Bully', sub: 'Highest win rate against a specific opponent',
       kind: 'vs',
     },
-    {
-      key: 'worstAgainst', mod: 'kryptonite',
-      emoji: '☠️', label: 'Kryptonite', sub: 'Lowest win rate against a specific opponent',
-      kind: 'vs',
-    },
   ];
 
   el.innerHTML = cards.map(({ key, mod, emoji, label, sub, kind }) => {

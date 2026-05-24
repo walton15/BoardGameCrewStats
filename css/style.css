@@ -1593,10 +1593,9 @@ footer {
   gap: 0.75rem;
 }
 
-.ts-card--best     { border-top-color: var(--rank1); }
-.ts-card--worst    { border-top-color: var(--muted); }
-.ts-card--bully    { border-top-color: #e8a95c; }
-.ts-card--kryptonite { border-top-color: #b87fd0; }
+.ts-card--best  { border-top-color: var(--rank1); }
+.ts-card--worst { border-top-color: var(--muted); }
+.ts-card--bully { border-top-color: #e8a95c; }
 
 .ts-card-header {
   display: flex;
