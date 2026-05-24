@@ -1508,6 +1508,7 @@ footer {
   text-transform: uppercase;
   color: var(--muted);
   transition: color 0.15s;
+  white-space: nowrap;
 }
 
 .carousel-cycle-btn:hover { color: var(--gold); }
