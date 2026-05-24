@@ -558,10 +558,6 @@ function renderSessions(sessions, players) {
       ? `<button type="button" class="session-rounds-btn" data-session-id="${s.id}" aria-expanded="false" aria-label="Show ${rounds.length} rounds">${rounds.length}</button>`
       : '';
 
-    const hasTeam       = rounds.some(r => r.isTeam);
-    const teamBadgeHtml = hasTeam ? '<span class="session-team-badge">🤝 Team</span>' : '';
-    // Team chips are only unambiguous for single-round games (membership can vary per round)
-    const summaryTeamMap = (!isMultiRound && rounds[0].isTeam) ? teamIndexMap(rounds[0]) : null;
 
     // Compute per-player average placements across all rounds
     const allPlayerIds  = new Set(rounds.flatMap(r => r.placements.map(p => p.playerId)));
@@ -594,14 +590,12 @@ function renderSessions(sessions, players) {
 
     const summaryRows = summaryParticipants.map(p => {
       const placeDisplay = placeIcon(Math.round(p.avg));
-      const chip = summaryTeamMap ? teamChip(summaryTeamMap.get(p.key)) : '';
       return `
         <tr class="${p.isGuest ? 'guest-row' : ''}">
           <td class="td-place">${placeDisplay}</td>
           <td class="td-name">
             ${!p.isGuest ? `<span class="player-dot" style="background:${p.color}"></span>` : ''}
             ${p.name}
-            ${chip}
             ${p.isGuest ? '<span class="guest-badge">Guest</span>' : ''}
           </td>
         </tr>
@@ -612,7 +606,6 @@ function renderSessions(sessions, players) {
     const roundDetailHtml = isMultiRound ? `
       <div class="session-rounds-detail" id="rounds-detail-${s.id}" hidden>
         ${rounds.map((round, idx) => {
-          const roundTeamMap = teamIndexMap(round);
           const roundParticipants = [
             ...round.placements.map(p => ({
               key: p.playerId,
@@ -622,22 +615,18 @@ function renderSessions(sessions, players) {
             ...(round.guests || []).map(g => ({ key: `guest:${g.name}`, name: g.name, place: g.place, color: null, isGuest: true })),
           ].sort((a, b) => a.place - b.place || (a.isGuest ? 1 : -1));
 
-          const roundRows = roundParticipants.map(p => {
-            const chip = roundTeamMap ? teamChip(roundTeamMap.get(p.key)) : '';
-            return `
+          const roundRows = roundParticipants.map(p => `
             <tr class="${p.isGuest ? 'guest-row' : ''}">
               <td class="td-place">${placeIcon(p.place)}</td>
               <td class="td-name">
                 ${!p.isGuest ? `<span class="player-dot" style="background:${p.color}"></span>` : ''}
                 ${p.name}
-                ${chip}
                 ${p.isGuest ? '<span class="guest-badge">Guest</span>' : ''}
               </td>
             </tr>
-          `;
-          }).join('');
+          `).join('');
 
-          const headerLabel = round.isTeam ? `Round ${idx + 1} · Teams` : `Round ${idx + 1}`;
+          const headerLabel = `Round ${idx + 1}`;
           return `
             <div class="session-round-header">${headerLabel}</div>
             <table class="session-table"><tbody>${roundRows}</tbody></table>
@@ -650,7 +639,7 @@ function renderSessions(sessions, players) {
       <div class="session-card"${cardStyle}>
         <div class="session-head">
           <div>
-            <div class="session-game">${thumbHtml} ${s.game} ${teamBadgeHtml}</div>
+            <div class="session-game">${thumbHtml} ${s.game}</div>
             <div class="session-date">${dateStr}</div>
           </div>
           <div style="display:flex;align-items:center;gap:0.5rem;">
