@@ -98,20 +98,24 @@ export default {
     const fileData = JSON.parse(kvVal);
 
     if (type === 'session') {
-      const { date, game, gameImage, gameImageFull, placements, guests } = data;
+      const { date, game, gameImage, gameImageFull, rounds, placements, guests } = data;
       const nextId = fileData.sessions.length
         ? Math.max(...fileData.sessions.map(s => s.id)) + 1
         : 1;
-      const sessionObj = { id: nextId, date, game, placements, guests: guests || [] };
+      const sessionObj = { id: nextId, date, game };
+      if (rounds) sessionObj.rounds = rounds;
+      else { sessionObj.placements = placements || []; sessionObj.guests = guests || []; }
       if (gameImage)     sessionObj.gameImage     = gameImage;
       if (gameImageFull) sessionObj.gameImageFull = gameImageFull;
       fileData.sessions.push(sessionObj);
 
     } else if (type === 'update-session') {
-      const { id, date, game, gameImage, gameImageFull, placements, guests } = data;
+      const { id, date, game, gameImage, gameImageFull, rounds, placements, guests } = data;
       const idx = fileData.sessions.findIndex(s => s.id === id);
       if (idx === -1) return jsonRes({ error: `Session ${id} not found` }, 404);
-      const sessionObj = { id, date, game, placements, guests: guests || [] };
+      const sessionObj = { id, date, game };
+      if (rounds) sessionObj.rounds = rounds;
+      else { sessionObj.placements = placements || []; sessionObj.guests = guests || []; }
       if (gameImage)     sessionObj.gameImage     = gameImage;
       if (gameImageFull) sessionObj.gameImageFull = gameImageFull;
       fileData.sessions[idx] = sessionObj;

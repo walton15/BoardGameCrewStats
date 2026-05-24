@@ -23,29 +23,41 @@ async function loadData() {
   return res.json();
 }
 
+function getRounds(s) {
+  return s.rounds ?? [{ placements: s.placements || [], guests: s.guests || [] }];
+}
+
 function calcStats(players, sessions) {
   const ranked = players.map(player => {
-    let firstCount = 0;
-    let lastCount  = 0;
-    const places   = [];
+    let firstCount  = 0;
+    let lastCount   = 0;
+    const sessionAvgs = [];
 
     sessions.forEach(s => {
-      const found = s.placements.find(p => p.playerId === player.id);
-      if (!found) return;
-      places.push(found.place);
-      if (found.place === 1) firstCount++;
-      const worstPlace = Math.max(
-        ...s.placements.map(p => p.place),
-        ...(s.guests || []).map(g => g.place),
-      );
-      if (found.place === worstPlace) lastCount++;
+      const rounds = getRounds(s);
+      const roundPlaces = [];
+
+      rounds.forEach(round => {
+        const found = round.placements.find(p => p.playerId === player.id);
+        if (!found) return;
+        roundPlaces.push(found.place);
+        if (found.place === 1) firstCount++;
+        const worstInRound = Math.max(
+          ...round.placements.map(p => p.place),
+          ...(round.guests || []).map(g => g.place),
+        );
+        if (found.place === worstInRound) lastCount++;
+      });
+
+      if (!roundPlaces.length) return;
+      sessionAvgs.push(roundPlaces.reduce((a, b) => a + b, 0) / roundPlaces.length);
     });
 
-    const avg = places.length
-      ? +(places.reduce((a, b) => a + b, 0) / places.length).toFixed(2)
+    const avg = sessionAvgs.length
+      ? +(sessionAvgs.reduce((a, b) => a + b, 0) / sessionAvgs.length).toFixed(2)
       : null;
 
-    return { ...player, avg, sessionCount: places.length, firstCount, lastCount };
+    return { ...player, avg, sessionCount: sessionAvgs.length, firstCount, lastCount };
   }).sort((a, b) => {
     if (a.avg === null && b.avg === null) return 0;
     if (a.avg === null) return 1;
@@ -221,8 +233,10 @@ function renderChart(ranked, sessions) {
   const datasets = ranked.map(p => ({
     label: p.name,
     data: sorted.map(s => {
-      const found = s.placements.find(pl => pl.playerId === p.id);
-      return found ? found.place : null;
+      const rounds = getRounds(s);
+      const places = rounds.flatMap(r => r.placements.filter(pl => pl.playerId === p.id).map(pl => pl.place));
+      if (!places.length) return null;
+      return +(places.reduce((a, b) => a + b, 0) / places.length).toFixed(2);
     }),
     borderColor: p.color,
     backgroundColor: p.color + '22',
@@ -378,7 +392,7 @@ function renderChart(ranked, sessions) {
           bodyColor: '#f0e6d3',
           callbacks: {
             label: ctx => ctx.raw !== null
-              ? ` ${ctx.dataset.label}: #${ctx.raw} place`
+              ? ` ${ctx.dataset.label}: ${ctx.raw % 1 === 0 ? `#${ctx.raw}` : `avg ${ctx.raw}`} place`
               : ` ${ctx.dataset.label}: absent`,
           },
         },
@@ -471,23 +485,44 @@ function renderSessions(sessions, players) {
   if (!sorted.length) { container.innerHTML = '<p class="empty-state">No sessions yet.</p>'; return; }
 
   container.innerHTML = sorted.map(s => {
+    const rounds = getRounds(s);
+    const isMultiRound = rounds.length > 1;
+
     const d = new Date(s.date + 'T00:00:00');
     const dateStr = d.toLocaleDateString('en-US', {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
     });
 
-    const presentIds = new Set(s.placements.map(p => p.playerId));
+    const bgImage   = s.gameImageFull || s.gameImage;
+    const cardStyle = bgImage ? ` style="--game-bg:url('${bgImage}')"` : '';
+    const thumbHtml = s.gameImage
+      ? `<img class="session-game-thumb" src="${s.gameImage}" alt="${s.game}">`
+      : '🎲';
 
-    const participants = [
-      ...s.placements.map(p => ({
-        name: pMap[p.playerId]?.name ?? p.playerId,
-        place: p.place, color: pMap[p.playerId]?.color ?? '#888', isGuest: false, isAbsent: false,
-      })),
-      ...(s.guests || []).map(g => ({ name: g.name, place: g.place, color: null, isGuest: true, isAbsent: false })),
-    ].sort((a, b) => a.place - b.place || (a.isGuest ? 1 : -1));
+    const badgeHtml  = isMultiRound ? `<span class="session-rounds-badge">${rounds.length} rounds</span>` : '';
+    const toggleHtml = isMultiRound
+      ? `<button type="button" class="session-toggle-btn" data-session-id="${s.id}" aria-expanded="false" aria-label="Expand rounds">&#8964;</button>`
+      : '';
+
+    // Compute per-player average placements across all rounds
+    const allPlayerIds  = new Set(rounds.flatMap(r => r.placements.map(p => p.playerId)));
+    const allGuestNames = [...new Set(rounds.flatMap(r => (r.guests || []).map(g => g.name)))];
+
+    const summaryParticipants = [
+      ...[...allPlayerIds].map(pid => {
+        const places = rounds.flatMap(r => r.placements.filter(p => p.playerId === pid).map(p => p.place));
+        const avg = places.reduce((a, b) => a + b, 0) / places.length;
+        return { name: pMap[pid]?.name ?? pid, color: pMap[pid]?.color ?? '#888', avg, isGuest: false };
+      }),
+      ...allGuestNames.map(name => {
+        const places = rounds.flatMap(r => (r.guests || []).filter(g => g.name === name).map(g => g.place));
+        const avg = places.reduce((a, b) => a + b, 0) / places.length;
+        return { name, color: null, avg, isGuest: true };
+      }),
+    ].sort((a, b) => a.avg - b.avg || (a.isGuest ? 1 : -1));
 
     const absentRows = players
-      .filter(p => !presentIds.has(p.id))
+      .filter(p => !allPlayerIds.has(p.id))
       .map(p => `
         <tr class="absent-row">
           <td class="td-place">💤</td>
@@ -498,36 +533,83 @@ function renderSessions(sessions, players) {
         </tr>
       `).join('');
 
-    const rows = participants.map(p => `
-      <tr class="${p.isGuest ? 'guest-row' : ''}">
-        <td class="td-place">${placeIcon(p.place)}</td>
-        <td class="td-name">
-          ${!p.isGuest ? `<span class="player-dot" style="background:${p.color}"></span>` : ''}
-          ${p.name}
-          ${p.isGuest ? '<span class="guest-badge">Guest</span>' : ''}
-        </td>
-      </tr>
-    `).join('');
+    const summaryRows = summaryParticipants.map(p => {
+      const placeDisplay = isMultiRound
+        ? (p.avg % 1 === 0 ? `avg ${p.avg.toFixed(0)}` : `avg ${p.avg.toFixed(2)}`)
+        : placeIcon(p.avg);
+      return `
+        <tr class="${p.isGuest ? 'guest-row' : ''}">
+          <td class="td-place">${placeDisplay}</td>
+          <td class="td-name">
+            ${!p.isGuest ? `<span class="player-dot" style="background:${p.color}"></span>` : ''}
+            ${p.name}
+            ${p.isGuest ? '<span class="guest-badge">Guest</span>' : ''}
+          </td>
+        </tr>
+      `;
+    }).join('');
 
-    const bgImage   = s.gameImageFull || s.gameImage;
-    const cardStyle = bgImage ? ` style="--game-bg:url('${bgImage}')"` : '';
-    const thumbHtml = s.gameImage
-      ? `<img class="session-game-thumb" src="${s.gameImage}" alt="${s.game}">`
-      : '🎲';
+    // Per-round detail tables (multi-round only, hidden by default)
+    const roundDetailHtml = isMultiRound ? `
+      <div class="session-rounds-detail" id="rounds-detail-${s.id}" hidden>
+        ${rounds.map((round, idx) => {
+          const roundParticipants = [
+            ...round.placements.map(p => ({
+              name: pMap[p.playerId]?.name ?? p.playerId,
+              place: p.place, color: pMap[p.playerId]?.color ?? '#888', isGuest: false,
+            })),
+            ...(round.guests || []).map(g => ({ name: g.name, place: g.place, color: null, isGuest: true })),
+          ].sort((a, b) => a.place - b.place || (a.isGuest ? 1 : -1));
+
+          const roundRows = roundParticipants.map(p => `
+            <tr class="${p.isGuest ? 'guest-row' : ''}">
+              <td class="td-place">${placeIcon(p.place)}</td>
+              <td class="td-name">
+                ${!p.isGuest ? `<span class="player-dot" style="background:${p.color}"></span>` : ''}
+                ${p.name}
+                ${p.isGuest ? '<span class="guest-badge">Guest</span>' : ''}
+              </td>
+            </tr>
+          `).join('');
+
+          return `
+            <div class="session-round-header">Round ${idx + 1}</div>
+            <table class="session-table"><tbody>${roundRows}</tbody></table>
+          `;
+        }).join('')}
+      </div>
+    ` : '';
 
     return `
       <div class="session-card"${cardStyle}>
         <div class="session-head">
           <div>
-            <div class="session-game">${thumbHtml} ${s.game}</div>
+            <div class="session-game">${thumbHtml} ${s.game} ${badgeHtml}</div>
             <div class="session-date">${dateStr}</div>
           </div>
-          <a href="session.html?edit=${s.id}" class="btn-edit-session">Edit</a>
+          <div style="display:flex;align-items:center;gap:0.5rem;">
+            ${toggleHtml}
+            <a href="session.html?edit=${s.id}" class="btn-edit-session">Edit</a>
+          </div>
         </div>
-        <table class="session-table"><tbody>${rows}${absentRows}</tbody></table>
+        <table class="session-table"><tbody>${summaryRows}${absentRows}</tbody></table>
+        ${roundDetailHtml}
       </div>
     `;
   }).join('');
+
+  // Expand/collapse round detail via event delegation
+  container.addEventListener('click', e => {
+    const btn = e.target.closest('.session-toggle-btn');
+    if (!btn) return;
+    const sid    = btn.dataset.sessionId;
+    const detail = document.getElementById(`rounds-detail-${sid}`);
+    if (!detail) return;
+    const expanded = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!expanded));
+    btn.innerHTML  = expanded ? '&#8964;' : '&#8963;';
+    detail.hidden  = expanded;
+  });
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────

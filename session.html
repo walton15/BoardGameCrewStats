@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=20260523">
 </head>
 <body>
 
@@ -56,24 +56,17 @@
         </div>
       </div>
 
-      <!-- Player placements -->
+      <!-- Rounds -->
       <div class="admin-card">
-        <div class="admin-card-title">Player Placements</div>
+        <div class="admin-card-title">Rounds</div>
         <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem;font-style:italic;">
+          Most sessions have one round. Use multiple rounds when the same game is played more than once in a session.
           Enter each player's finishing place (ties OK). Check Absent if they didn't play.
           For games decided by elimination, use death order — first to die gets last place.
         </p>
-        <div id="player-rows"></div>
-      </div>
-
-      <!-- Guests -->
-      <div class="admin-card">
-        <div class="admin-card-title">Guests (optional)</div>
-        <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem;font-style:italic;">
-          Guests are shown in sessions but excluded from overall rankings.
-        </p>
-        <div id="guest-entries" class="guest-entries"></div>
-        <button type="button" id="btn-add-guest" class="btn-add-guest">+ Add Guest</button>
+        <div class="round-tabs-bar" id="round-tabs-bar"></div>
+        <div id="round-panels"></div>
+        <button type="button" id="btn-add-round" class="btn-add-round">+ Add Round</button>
       </div>
 
       <!-- Submit -->
@@ -108,6 +101,6 @@
     <p>Board Game Crew Stats</p>
   </footer>
 
-  <script src="js/admin.js"></script>
+  <script src="js/admin.js?v=20260523"></script>
 </body>
 </html>

@@ -129,12 +129,12 @@ async function loadData() {
     const res = await fetch(`${WORKER_URL}?env=${IS_LOCAL ? 'local' : 'prod'}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     currentData = await res.json();
-    buildPlayerRows(currentData.players);
+    initRounds(currentData.players);
     populateGameDatalist();
     setStatus('', null);
   } catch (err) {
     setStatus(`Could not load data: ${err.message}`, 'error');
-    buildPlayerRows(defaultPlayers());
+    initRounds(defaultPlayers());
   }
 }
 
@@ -148,11 +148,39 @@ function defaultPlayers() {
   ];
 }
 
-// ── Player rows ───────────────────────────────────────────────────────────────
+// ── Game datalist ─────────────────────────────────────────────────────────────
 
-function buildPlayerRows(players) {
-  const container = document.getElementById('player-rows');
-  container.innerHTML = players.map(p => `
+function populateGameDatalist() {
+  if (!currentData) return;
+  const list  = document.getElementById('game-suggestions');
+  const games = [...new Set(currentData.sessions.map(s => s.game))];
+  list.innerHTML = games.map(g => `<option value="${g}">`).join('');
+}
+
+// ── Round tabs ────────────────────────────────────────────────────────────────
+
+function buildRoundPanel(roundIdx, players) {
+  const panel = document.createElement('div');
+  panel.className       = 'round-panel';
+  panel.dataset.roundIdx = roundIdx;
+
+  const rowsId    = `player-rows-${roundIdx}`;
+  const guestsId  = `guest-entries-${roundIdx}`;
+  const addGuestId = `btn-add-guest-${roundIdx}`;
+
+  panel.innerHTML = `
+    <div class="round-section-label">Player Placements</div>
+    <div id="${rowsId}"></div>
+    <div class="round-section-label" style="margin-top:1.25rem;">Guests <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></div>
+    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:0.75rem;font-style:italic;">
+      Guests are shown in sessions but excluded from overall rankings.
+    </p>
+    <div id="${guestsId}" class="guest-entries"></div>
+    <button type="button" id="${addGuestId}" class="btn-add-guest">+ Add Guest</button>
+  `;
+
+  const rowsContainer = panel.querySelector(`#${rowsId}`);
+  rowsContainer.innerHTML = players.map(p => `
     <div class="player-placement-row" data-player-id="${p.id}">
       <span class="player-placement-name">
         <span class="player-dot" style="background:${p.color}"></span>
@@ -165,25 +193,96 @@ function buildPlayerRows(players) {
     </div>
   `).join('');
 
-  container.querySelectorAll('.absent-check').forEach(cb => {
+  rowsContainer.querySelectorAll('.absent-check').forEach(cb => {
     cb.addEventListener('change', () => {
       const input = cb.closest('.player-placement-row').querySelector('.place-input');
       input.disabled = cb.checked;
       if (cb.checked) input.value = '';
     });
   });
+
+  panel.querySelector(`#${addGuestId}`).addEventListener('click', () => addGuestToRound(roundIdx));
+
+  return panel;
 }
 
-// ── Game datalist ─────────────────────────────────────────────────────────────
+function addGuestToRound(roundIdx) {
+  const id  = ++guestCount;
+  const row = document.createElement('div');
+  row.className = 'guest-entry';
+  row.dataset.guestId = id;
+  row.innerHTML = `
+    <input type="text"   class="guest-name-input"  placeholder="Guest name" aria-label="Guest name">
+    <input type="number" class="guest-place-input" min="1" max="20" placeholder="#" aria-label="Guest placement">
+    <button type="button" class="btn-remove-guest" aria-label="Remove guest">✕</button>
+  `;
+  row.querySelector('.btn-remove-guest').addEventListener('click', () => row.remove());
+  document.getElementById(`guest-entries-${roundIdx}`).appendChild(row);
+}
 
-function populateGameDatalist() {
-  if (!currentData) return;
-  const list  = document.getElementById('game-suggestions');
-  const games = [...new Set(currentData.sessions.map(s => s.game))];
-  list.innerHTML = games.map(g => `<option value="${g}">`).join('');
+function updateTabCloseVisibility() {
+  const tabs = document.querySelectorAll('#round-tabs-bar .round-tab');
+  tabs.forEach(tab => {
+    tab.querySelector('.round-tab-close').style.display = tabs.length <= 1 ? 'none' : '';
+  });
+}
+
+function switchTab(idx) {
+  document.querySelectorAll('#round-panels .round-panel').forEach((panel, i) => {
+    panel.style.display = i === idx ? 'block' : 'none';
+  });
+  document.querySelectorAll('#round-tabs-bar .round-tab').forEach((tab, i) => {
+    tab.classList.toggle('active', i === idx);
+  });
+}
+
+function deleteRound(idx) {
+  const tabs   = [...document.querySelectorAll('#round-tabs-bar .round-tab')];
+  const panels = [...document.querySelectorAll('#round-panels .round-panel')];
+  if (tabs.length <= 1) return;
+
+  tabs[idx].remove();
+  panels[idx].remove();
+
+  // Re-label remaining tabs
+  document.querySelectorAll('#round-tabs-bar .round-tab').forEach((tab, i) => {
+    tab.querySelector('.round-tab-label').textContent = `Round ${i + 1}`;
+  });
+
+  const newActive = Math.min(idx, tabs.length - 2);
+  updateTabCloseVisibility();
+  switchTab(newActive);
+}
+
+function addRound() {
+  const players = currentData?.players || defaultPlayers();
+  const idx     = document.querySelectorAll('#round-panels .round-panel').length;
+
+  const tab = document.createElement('button');
+  tab.type      = 'button';
+  tab.className = 'round-tab';
+  tab.innerHTML = `<span class="round-tab-label">Round ${idx + 1}</span><span class="round-tab-close" aria-label="Delete round ${idx + 1}">×</span>`;
+  document.getElementById('round-tabs-bar').appendChild(tab);
+
+  const panel = buildRoundPanel(idx, players);
+  document.getElementById('round-panels').appendChild(panel);
+
+  updateTabCloseVisibility();
+  switchTab(idx);
+}
+
+function initRounds(players) {
+  document.getElementById('round-tabs-bar').innerHTML = '';
+  document.getElementById('round-panels').innerHTML   = '';
+  guestCount = 0;
+  addRound();
 }
 
 // ── Edit mode population ──────────────────────────────────────────────────────
+
+function getRoundsFromSession(session) {
+  return session.rounds ?? [{ placements: session.placements || [], guests: session.guests || [] }];
+}
 
 function populateEditForm() {
   if (!currentData) return;
@@ -200,44 +299,43 @@ function populateEditForm() {
     document.getElementById('game-image-preview').hidden = false;
   }
 
-  document.querySelectorAll('#player-rows .player-placement-row').forEach(row => {
-    const placement   = session.placements.find(p => p.playerId === row.dataset.playerId);
-    const placeInput  = row.querySelector('.place-input');
-    const absentCheck = row.querySelector('.absent-check');
-    if (placement) {
-      placeInput.value    = placement.place;
-      absentCheck.checked = false;
-      placeInput.disabled = false;
-    } else {
-      absentCheck.checked = true;
-      placeInput.disabled = true;
-      placeInput.value    = '';
-    }
+  const rounds = getRoundsFromSession(session);
+
+  // Clear the auto-created Round 1 from initRounds, then rebuild from session data
+  document.getElementById('round-tabs-bar').innerHTML = '';
+  document.getElementById('round-panels').innerHTML   = '';
+
+  rounds.forEach((round, idx) => {
+    addRound();
+
+    const panels = document.querySelectorAll('#round-panels .round-panel');
+    const panel  = panels[panels.length - 1];
+
+    panel.querySelectorAll('.player-placement-row').forEach(row => {
+      const placement   = round.placements.find(p => p.playerId === row.dataset.playerId);
+      const placeInput  = row.querySelector('.place-input');
+      const absentCheck = row.querySelector('.absent-check');
+      if (placement) {
+        placeInput.value    = placement.place;
+        absentCheck.checked = false;
+        placeInput.disabled = false;
+      } else {
+        absentCheck.checked = true;
+        placeInput.disabled = true;
+        placeInput.value    = '';
+      }
+    });
+
+    (round.guests || []).forEach(g => {
+      addGuestToRound(idx);
+      const guestRows = document.querySelectorAll(`#guest-entries-${idx} .guest-entry`);
+      const lastRow   = guestRows[guestRows.length - 1];
+      lastRow.querySelector('.guest-name-input').value  = g.name;
+      lastRow.querySelector('.guest-place-input').value = g.place;
+    });
   });
 
-  (session.guests || []).forEach(g => {
-    addGuest();
-    const rows    = document.querySelectorAll('#guest-entries .guest-entry');
-    const lastRow = rows[rows.length - 1];
-    lastRow.querySelector('.guest-name-input').value  = g.name;
-    lastRow.querySelector('.guest-place-input').value = g.place;
-  });
-}
-
-// ── Guests ────────────────────────────────────────────────────────────────────
-
-function addGuest() {
-  const id  = ++guestCount;
-  const row = document.createElement('div');
-  row.className = 'guest-entry';
-  row.dataset.guestId = id;
-  row.innerHTML = `
-    <input type="text"   class="guest-name-input"  placeholder="Guest name" aria-label="Guest name">
-    <input type="number" class="guest-place-input" min="1" max="20" placeholder="#" aria-label="Guest placement">
-    <button type="button" class="btn-remove-guest" aria-label="Remove guest">✕</button>
-  `;
-  row.querySelector('.btn-remove-guest').addEventListener('click', () => row.remove());
-  document.getElementById('guest-entries').appendChild(row);
+  switchTab(0);
 }
 
 // ── Status ────────────────────────────────────────────────────────────────────
@@ -292,8 +390,8 @@ function initDeleteSection() {
 async function handleSubmit(e) {
   e.preventDefault();
 
-  const date      = document.getElementById('session-date').value;
-  const game      = document.getElementById('session-game').value.trim();
+  const date          = document.getElementById('session-date').value;
+  const game          = document.getElementById('session-game').value.trim();
   const gameImage     = document.getElementById('game-image-url').value || null;
   const gameImageFull = document.getElementById('game-image-full-url').value || null;
 
@@ -302,26 +400,29 @@ async function handleSubmit(e) {
     return;
   }
 
-  const placements = [];
-  document.querySelectorAll('#player-rows .player-placement-row').forEach(row => {
-    if (row.querySelector('.absent-check').checked) return;
-    const place = parseInt(row.querySelector('.place-input').value, 10);
-    if (!isNaN(place) && place >= 1) {
-      placements.push({ playerId: row.dataset.playerId, place });
-    }
+  const rounds = [];
+  document.querySelectorAll('#round-panels .round-panel').forEach((panel, idx) => {
+    const placements = [];
+    panel.querySelectorAll('.player-placement-row').forEach(row => {
+      if (row.querySelector('.absent-check').checked) return;
+      const place = parseInt(row.querySelector('.place-input').value, 10);
+      if (!isNaN(place) && place >= 1) placements.push({ playerId: row.dataset.playerId, place });
+    });
+
+    const guests = [];
+    panel.querySelectorAll('.guest-entry').forEach(row => {
+      const name  = row.querySelector('.guest-name-input').value.trim();
+      const place = parseInt(row.querySelector('.guest-place-input').value, 10);
+      if (name && !isNaN(place) && place >= 1) guests.push({ name, place });
+    });
+
+    rounds.push({ placements, guests });
   });
 
-  if (!placements.length) {
+  if (!rounds.some(r => r.placements.length > 0)) {
     setStatus('At least one player must have a placement.', 'error');
     return;
   }
-
-  const guests = [];
-  document.querySelectorAll('#guest-entries .guest-entry').forEach(row => {
-    const name  = row.querySelector('.guest-name-input').value.trim();
-    const place = parseInt(row.querySelector('.guest-place-input').value, 10);
-    if (name && !isNaN(place) && place >= 1) guests.push({ name, place });
-  });
 
   const btn = document.getElementById('btn-submit');
   btn.disabled = true;
@@ -329,20 +430,19 @@ async function handleSubmit(e) {
 
   try {
     if (editId) {
-      await workerPost('update-session', { id: editId, date, game, gameImage, gameImageFull, placements, guests });
-      setStatus(`✓ Session updated successfully!`, 'success');
+      await workerPost('update-session', { id: editId, date, game, gameImage, gameImageFull, rounds });
+      setStatus('✓ Session updated successfully!', 'success');
     } else {
-      await workerPost('session', { date, game, gameImage, gameImageFull, placements, guests });
+      await workerPost('session', { date, game, gameImage, gameImageFull, rounds });
       setStatus(`✓ "${game}" saved successfully!`, 'success');
       document.getElementById('session-form').reset();
-      document.getElementById('guest-entries').innerHTML = '';
       document.getElementById('game-image-url').value      = '';
       document.getElementById('game-image-full-url').value = '';
       document.getElementById('game-image-preview').hidden = true;
       hideBggDropdown();
       guestCount = 0;
       document.getElementById('session-date').valueAsDate = new Date();
-      document.querySelectorAll('.place-input').forEach(i => { i.disabled = false; });
+      initRounds(currentData?.players || defaultPlayers());
     }
   } catch (err) {
     setStatus(`Error: ${err.message}`, 'error');
@@ -367,8 +467,19 @@ async function init() {
   }
 
   document.getElementById('session-date').valueAsDate = new Date();
-  document.getElementById('btn-add-guest').addEventListener('click', addGuest);
+  document.getElementById('btn-add-round').addEventListener('click', addRound);
   document.getElementById('session-form').addEventListener('submit', handleSubmit);
+
+  // Wire tab bar with event delegation once — avoids stale closures across initRounds resets
+  document.getElementById('round-tabs-bar').addEventListener('click', e => {
+    const closeBtn = e.target.closest('.round-tab-close');
+    const tab      = e.target.closest('.round-tab');
+    if (!tab) return;
+    const tabs = [...document.querySelectorAll('#round-tabs-bar .round-tab')];
+    const idx  = tabs.indexOf(tab);
+    if (closeBtn) { e.stopPropagation(); deleteRound(idx); }
+    else switchTab(idx);
+  });
 
   await loadData();
   if (editId) populateEditForm();
