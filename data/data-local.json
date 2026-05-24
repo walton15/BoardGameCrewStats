@@ -220,6 +220,12 @@
       "guests": [],
       "gameImage": "https://cf.geekdo-images.com/4CEaXqehBHS4JCPGMDfnsg__small/img/zSHJ5HoLmv4SH8LSsQW_6VubexA=/fit-in/200x150/filters:strip_icc()/pic857.jpg",
       "gameImageFull": "https://cf.geekdo-images.com/4CEaXqehBHS4JCPGMDfnsg__original/img/hlBKez79K3my9EIFynxty5iwTCA=/0x0/filters:format(jpeg)/pic857.jpg"
+    },
+    {
+      "id": 8,
+      "date": "2099-01-01",
+      "game": "__DEPLOY_TEST__",
+      "guests": []
     }
   ]
 }
