@@ -603,12 +603,10 @@ function renderSessions(sessions, players) {
     }).join('');
 
     // Build carousel panels for multi-round sessions
-    let bodyHtml, carouselDotsHtml = '';
+    let bodyHtml;
 
     if (isMultiRound) {
       const panelLabels = ['Overall', ...rounds.map((_, i) => `Round ${i + 1}`)];
-
-      carouselDotsHtml = `<div class="carousel-dots">${panelLabels.map((_, i) => `<span class="carousel-dot${i === 0 ? ' active' : ''}" data-panel="${i}"></span>`).join('')}</div>`;
 
       const overallPanel = `
         <div class="carousel-panel" data-panel="0">
@@ -649,7 +647,7 @@ function renderSessions(sessions, players) {
     }
 
     const headRight = isMultiRound
-      ? `<div class="session-head-right"><a href="session.html?edit=${s.id}" class="btn-edit-session">Edit</a><div class="carousel-nav-row"><span class="carousel-label">Overall</span>${carouselDotsHtml}</div></div>`
+      ? `<div class="session-head-right"><a href="session.html?edit=${s.id}" class="btn-edit-session">Edit</a><button class="carousel-cycle-btn">Overall ›</button></div>`
       : `<a href="session.html?edit=${s.id}" class="btn-edit-session">Edit</a>`;
 
     const cardHtml = `
@@ -667,24 +665,20 @@ function renderSessions(sessions, players) {
     return isMultiRound ? `<div class="session-card-wrapper">${cardHtml}</div>` : cardHtml;
   }).join('');
 
-  // Carousel dot navigation via event delegation
+  // Carousel cycle button via event delegation
   container.addEventListener('click', e => {
-    const dot = e.target.closest('.carousel-dot');
-    if (!dot) return;
-    const card = dot.closest('.session-card');
+    const btn = e.target.closest('.carousel-cycle-btn');
+    if (!btn) return;
+    const card = btn.closest('.session-card');
     const carousel = card.querySelector('.session-carousel');
     if (!carousel) return;
-    const slide = parseInt(dot.dataset.panel, 10);
+    const count = parseInt(carousel.dataset.count, 10);
+    let slide = (parseInt(carousel.dataset.slide, 10) + 1) % count;
     carousel.querySelectorAll('.carousel-panel').forEach(p => {
       p.hidden = parseInt(p.dataset.panel, 10) !== slide;
     });
-    const dotsEl = dot.closest('.carousel-dots');
-    dotsEl.querySelectorAll('.carousel-dot').forEach((d, i) => {
-      d.classList.toggle('active', i === slide);
-    });
-    const count = parseInt(carousel.dataset.count, 10);
     const labels = ['Overall', ...Array.from({ length: count - 1 }, (_, i) => `Round ${i + 1}`)];
-    dotsEl.closest('.carousel-nav-row').querySelector('.carousel-label').textContent = labels[slide];
+    btn.textContent = labels[slide] + ' ›';
     carousel.dataset.slide = slide;
   });
 }

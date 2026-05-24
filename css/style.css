@@ -1491,44 +1491,24 @@ footer {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 0.3rem;
+  justify-content: space-between;
+  align-self: stretch;
 }
 
-.carousel-nav-row {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.carousel-label {
-  font-size: 0.62rem;
+.carousel-cycle-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 0.72rem;
   font-family: 'Cinzel', serif;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--muted);
+  transition: color 0.15s;
 }
 
-.carousel-dots {
-  display: flex;
-  gap: 0.3rem;
-  align-items: center;
-}
-
-.carousel-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(201,185,122,0.25);
-  cursor: pointer;
-  transition: background 0.15s, transform 0.15s;
-}
-
-.carousel-dot:hover { background: rgba(201,185,122,0.55); }
-
-.carousel-dot.active {
-  background: var(--gold);
-  transform: scale(1.35);
-}
+.carousel-cycle-btn:hover { color: var(--gold); }
 
 /* Stacked card effect for multi-round sessions */
 .session-card-wrapper {
