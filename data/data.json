@@ -224,6 +224,28 @@
       "game": "Secret Hitler",
       "rounds": [
         {
+          "isTeam": true,
+          "teams": [
+            {
+              "place": 1,
+              "playerIds": [
+                "taylor",
+                "autumn",
+                "jack",
+                "maddy"
+              ],
+              "guestNames": []
+            },
+            {
+              "place": 5,
+              "playerIds": [
+                "walton"
+              ],
+              "guestNames": [
+                "Carl"
+              ]
+            }
+          ],
           "placements": [
             {
               "playerId": "taylor",
@@ -234,16 +256,68 @@
               "place": 1
             },
             {
+              "playerId": "jack",
+              "place": 1
+            },
+            {
+              "playerId": "maddy",
+              "place": 1
+            },
+            {
+              "playerId": "walton",
+              "place": 5
+            }
+          ],
+          "guests": [
+            {
+              "name": "Carl",
+              "place": 5
+            }
+          ]
+        },
+        {
+          "isTeam": true,
+          "teams": [
+            {
+              "place": 1,
+              "playerIds": [
+                "taylor",
+                "autumn",
+                "maddy"
+              ],
+              "guestNames": [
+                "Carl"
+              ]
+            },
+            {
+              "place": 5,
+              "playerIds": [
+                "walton",
+                "jack"
+              ],
+              "guestNames": []
+            }
+          ],
+          "placements": [
+            {
+              "playerId": "taylor",
+              "place": 1
+            },
+            {
+              "playerId": "autumn",
+              "place": 1
+            },
+            {
+              "playerId": "maddy",
+              "place": 1
+            },
+            {
               "playerId": "walton",
               "place": 5
             },
             {
               "playerId": "jack",
               "place": 5
-            },
-            {
-              "playerId": "maddy",
-              "place": 1
             }
           ],
           "guests": [
@@ -254,45 +328,29 @@
           ]
         },
         {
-          "placements": [
+          "isTeam": true,
+          "teams": [
             {
-              "playerId": "taylor",
-              "place": 1
+              "place": 1,
+              "playerIds": [
+                "walton",
+                "jack"
+              ],
+              "guestNames": [
+                "Carl"
+              ]
             },
             {
-              "playerId": "autumn",
-              "place": 1
-            },
-            {
-              "playerId": "walton",
-              "place": 5
-            },
-            {
-              "playerId": "jack",
-              "place": 5
-            },
-            {
-              "playerId": "maddy",
-              "place": 1
+              "place": 4,
+              "playerIds": [
+                "taylor",
+                "autumn",
+                "maddy"
+              ],
+              "guestNames": []
             }
           ],
-          "guests": [
-            {
-              "name": "Carl",
-              "place": 1
-            }
-          ]
-        },
-        {
           "placements": [
-            {
-              "playerId": "taylor",
-              "place": 4
-            },
-            {
-              "playerId": "autumn",
-              "place": 4
-            },
             {
               "playerId": "walton",
               "place": 1
@@ -300,6 +358,14 @@
             {
               "playerId": "jack",
               "place": 1
+            },
+            {
+              "playerId": "taylor",
+              "place": 4
+            },
+            {
+              "playerId": "autumn",
+              "place": 4
             },
             {
               "playerId": "maddy",
