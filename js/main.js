@@ -135,6 +135,80 @@ function placeIcon(n) {
   return `#${n}`;
 }
 
+// ── Team Chemistry Stats ──────────────────────────────────────────────────────
+
+function calcTeamStats(players, sessions) {
+  const pMap = Object.fromEntries(players.map(p => [p.id, p]));
+  const teammate = new Map(); // "idA|idB" (sorted) -> {wins, games}
+  const against  = new Map(); // "idA|idB" (directed) -> {wins, games}
+
+  for (const s of sessions) {
+    for (const round of getRounds(s)) {
+      if (!round.isTeam) continue;
+      const teamMap = teamIndexMap(round);
+      if (!teamMap) continue;
+      const parts = round.placements
+        .filter(p => pMap[p.playerId])
+        .map(p => ({ id: p.playerId, place: p.place, team: teamMap.get(p.playerId) }));
+
+      for (let i = 0; i < parts.length; i++) {
+        const A = parts[i];
+        for (let j = 0; j < parts.length; j++) {
+          if (i === j) continue;
+          const B = parts[j];
+          if (A.team === B.team) {
+            if (A.id < B.id) {
+              const key = `${A.id}|${B.id}`;
+              const rec = teammate.get(key) ?? { wins: 0, games: 0 };
+              rec.games++;
+              if (A.place === 1) rec.wins++;
+              teammate.set(key, rec);
+            }
+          } else {
+            const key = `${A.id}|${B.id}`;
+            const rec = against.get(key) ?? { wins: 0, games: 0 };
+            rec.games++;
+            if (A.place === 1) rec.wins++;
+            against.set(key, rec);
+          }
+        }
+      }
+    }
+  }
+
+  function pickExtreme(map, dir) {
+    if (!map.size) return null;
+    const rated = [...map.entries()].map(([key, { wins, games }]) => ({
+      key, wins, games, wr: wins / games,
+    }));
+    const extreme = dir === 'max'
+      ? Math.max(...rated.map(r => r.wr))
+      : Math.min(...rated.map(r => r.wr));
+    const entries = rated.filter(r => Math.abs(r.wr - extreme) < 1e-9);
+    return { winrate: extreme, entries };
+  }
+
+  function parseKey(key) { const [a, b] = key.split('|'); return { a, b }; }
+
+  const raw = {
+    bestTeammates:  pickExtreme(teammate, 'max'),
+    worstTeammates: pickExtreme(teammate, 'min'),
+    bestAgainst:    pickExtreme(against,  'max'),
+    worstAgainst:   pickExtreme(against,  'min'),
+  };
+
+  const format = pick => pick
+    ? { winrate: pick.winrate, entries: pick.entries.map(e => ({ ...parseKey(e.key), wins: e.wins, games: e.games })) }
+    : null;
+
+  return {
+    bestTeammates:  format(raw.bestTeammates),
+    worstTeammates: format(raw.worstTeammates),
+    bestAgainst:    format(raw.bestAgainst),
+    worstAgainst:   format(raw.worstAgainst),
+  };
+}
+
 // ── Podium ────────────────────────────────────────────────────────────────────
 
 function renderPodium(ranked) {
@@ -683,6 +757,103 @@ function renderSessions(sessions, players) {
   });
 }
 
+// ── Team Chemistry Render ─────────────────────────────────────────────────────
+
+function avatarInner(p) {
+  return p.image
+    ? `<img src="${p.image}" alt="${p.name}">`
+    : `<span style="color:${p.color}">${p.name[0]}</span>`;
+}
+
+function renderTeamStats(stats, players) {
+  const el = document.getElementById('team-stats-container');
+  if (!el) return;
+  const pMap = Object.fromEntries(players.map(p => [p.id, p]));
+
+  const pct = wr => Math.round(wr * 100) + '%';
+
+  function pairEntry(e) {
+    const pa = pMap[e.a], pb = pMap[e.b];
+    if (!pa || !pb) return '';
+    return `
+      <div class="ts-entry">
+        <div class="ts-pair-avatars">
+          <div class="ts-avatar" style="border-color:${pa.color}">${avatarInner(pa)}</div>
+          <span class="ts-connector">&amp;</span>
+          <div class="ts-avatar" style="border-color:${pb.color}">${avatarInner(pb)}</div>
+        </div>
+        <div class="ts-pair-info">
+          <span class="ts-names">${pa.name} &amp; ${pb.name}</span>
+          <span class="ts-record">${e.wins}/${e.games} games</span>
+        </div>
+      </div>`;
+  }
+
+  function vsEntry(e) {
+    const pa = pMap[e.a], pb = pMap[e.b];
+    if (!pa || !pb) return '';
+    return `
+      <div class="ts-entry">
+        <div class="ts-vs-avatars">
+          <div class="ts-avatar" style="border-color:${pa.color}">${avatarInner(pa)}</div>
+          <span class="ts-arrow">&#8250;</span>
+          <div class="ts-avatar" style="border-color:${pb.color}">${avatarInner(pb)}</div>
+        </div>
+        <div class="ts-pair-info">
+          <span class="ts-names">${pa.name} vs ${pb.name}</span>
+          <span class="ts-record">${e.wins}/${e.games} games</span>
+        </div>
+      </div>`;
+  }
+
+  const empty = '<p class="ts-empty">Not enough team games yet</p>';
+
+  const cards = [
+    {
+      key: 'bestTeammates', mod: 'best',
+      emoji: '🤝', label: 'Best Teammates', sub: 'Win the most together',
+      kind: 'pair',
+    },
+    {
+      key: 'worstTeammates', mod: 'worst',
+      emoji: '💔', label: 'Worst Teammates', sub: "Can't find the magic",
+      kind: 'pair',
+    },
+    {
+      key: 'bestAgainst', mod: 'bully',
+      emoji: '😈', label: 'Biggest Bully', sub: 'Owns this matchup',
+      kind: 'vs',
+    },
+    {
+      key: 'worstAgainst', mod: 'kryptonite',
+      emoji: '☠️', label: 'Kryptonite', sub: "Just can't win this one",
+      kind: 'vs',
+    },
+  ];
+
+  el.innerHTML = cards.map(({ key, mod, emoji, label, sub, kind }) => {
+    const pick = stats[key];
+    const bodyHtml = (!pick || !pick.entries.length)
+      ? empty
+      : `
+        <div class="ts-winrate">${pct(pick.winrate)}</div>
+        <div class="ts-entries">
+          ${pick.entries.map(e => kind === 'pair' ? pairEntry(e) : vsEntry(e)).join('')}
+        </div>`;
+    return `
+      <div class="ts-card ts-card--${mod}">
+        <div class="ts-card-header">
+          <span class="ts-emoji">${emoji}</span>
+          <div>
+            <div class="ts-card-label">${label}</div>
+            <div class="ts-card-sub">${sub}</div>
+          </div>
+        </div>
+        ${bodyHtml}
+      </div>`;
+  }).join('');
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 
 async function init() {
@@ -691,6 +862,7 @@ async function init() {
     const ranked = calcStats(players, sessions);
     renderPodium(ranked);
     renderRankings(ranked);
+    renderTeamStats(calcTeamStats(players, sessions), players);
     renderChart(ranked, sessions);
     renderSessions(sessions, players);
   } catch (err) {

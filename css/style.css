@@ -1573,3 +1573,149 @@ footer {
 .team-chip-3 { color: #e8a95c; }
 .team-chip-4 { color: #b87fd0; }
 .team-chip-5 { color: #d96a6a; }
+
+/* ── Crew Chemistry (team stats) ─────────────────────────────────────────────── */
+
+.team-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.ts-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-top-width: 3px;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ts-card--best     { border-top-color: var(--rank1); }
+.ts-card--worst    { border-top-color: var(--muted); }
+.ts-card--bully    { border-top-color: #e8a95c; }
+.ts-card--kryptonite { border-top-color: #b87fd0; }
+
+.ts-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.ts-emoji {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.ts-card-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.ts-card-sub {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-style: italic;
+  margin-top: 0.15rem;
+}
+
+.ts-winrate {
+  font-family: 'Cinzel', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.ts-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.ts-entry {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.ts-entry + .ts-entry {
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--border);
+}
+
+.ts-pair-avatars,
+.ts-vs-avatars {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.ts-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.ts-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.ts-connector {
+  font-size: 1rem;
+  color: var(--muted);
+  font-family: 'Cinzel', serif;
+}
+
+.ts-arrow {
+  font-size: 1.1rem;
+  color: var(--gold);
+}
+
+.ts-pair-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.ts-names {
+  font-size: 0.8rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ts-record {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.ts-empty {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+@media (max-width: 640px) {
+  .team-stats-grid { grid-template-columns: 1fr; }
+  .ts-avatar { width: 36px; height: 36px; font-size: 0.9rem; }
+  .ts-winrate { font-size: 1.6rem; }
+}
