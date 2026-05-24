@@ -208,8 +208,14 @@
               "place": 3,
               "playerIds": [
                 "autumn",
-                "jack",
                 "maddy"
+              ],
+              "guestNames": []
+            },
+            {
+              "place": 3,
+              "playerIds": [
+                "jack"
               ],
               "guestNames": []
             }
@@ -228,11 +234,11 @@
               "place": 3
             },
             {
-              "playerId": "jack",
+              "playerId": "maddy",
               "place": 3
             },
             {
-              "playerId": "maddy",
+              "playerId": "jack",
               "place": 3
             }
           ],
