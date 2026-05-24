@@ -603,8 +603,12 @@ function renderSessions(sessions, players) {
     }).join('');
 
     // Build carousel panels for multi-round sessions
-    const bodyHtml = isMultiRound ? (() => {
+    let bodyHtml, carouselDotsHtml = '';
+
+    if (isMultiRound) {
       const panelLabels = ['Overall', ...rounds.map((_, i) => `Round ${i + 1}`)];
+
+      carouselDotsHtml = `<div class="carousel-dots">${panelLabels.map((_, i) => `<span class="carousel-dot${i === 0 ? ' active' : ''}" data-panel="${i}"></span>`).join('')}</div>`;
 
       const overallPanel = `
         <div class="carousel-panel" data-panel="0">
@@ -636,16 +640,17 @@ function renderSessions(sessions, players) {
         </div>`;
       }).join('');
 
-      return `
+      bodyHtml = `
         <div class="session-carousel" data-slide="0" data-count="${panelLabels.length}">
-          <div class="session-carousel-nav">
-            <button class="carousel-btn carousel-prev" aria-label="Previous">&#8249;</button>
-            <span class="carousel-label">${panelLabels[0]}</span>
-            <button class="carousel-btn carousel-next" aria-label="Next">&#8250;</button>
-          </div>
           ${overallPanel}${roundPanels}
         </div>`;
-    })() : `<table class="session-table"><tbody>${summaryRows}${absentRows}</tbody></table>`;
+    } else {
+      bodyHtml = `<table class="session-table"><tbody>${summaryRows}${absentRows}</tbody></table>`;
+    }
+
+    const headRight = isMultiRound
+      ? `<div class="session-head-right">${carouselDotsHtml}<a href="session.html?edit=${s.id}" class="btn-edit-session">Edit</a></div>`
+      : `<a href="session.html?edit=${s.id}" class="btn-edit-session">Edit</a>`;
 
     const cardHtml = `
       <div class="session-card"${cardStyle}>
@@ -654,7 +659,7 @@ function renderSessions(sessions, players) {
             <div class="session-game">${thumbHtml} ${s.game}</div>
             <div class="session-date">${dateStr}</div>
           </div>
-          <a href="session.html?edit=${s.id}" class="btn-edit-session">Edit</a>
+          ${headRight}
         </div>
         ${bodyHtml}
       </div>
@@ -662,22 +667,20 @@ function renderSessions(sessions, players) {
     return isMultiRound ? `<div class="session-card-wrapper">${cardHtml}</div>` : cardHtml;
   }).join('');
 
-  // Carousel navigation via event delegation
+  // Carousel dot navigation via event delegation
   container.addEventListener('click', e => {
-    const btn = e.target.closest('.carousel-prev, .carousel-next');
-    if (!btn) return;
-    const carousel = btn.closest('.session-carousel');
+    const dot = e.target.closest('.carousel-dot');
+    if (!dot) return;
+    const card = dot.closest('.session-card');
+    const carousel = card.querySelector('.session-carousel');
     if (!carousel) return;
-    const count = parseInt(carousel.dataset.count, 10);
-    let slide = parseInt(carousel.dataset.slide, 10);
-    slide = btn.classList.contains('carousel-next')
-      ? (slide + 1) % count
-      : (slide - 1 + count) % count;
+    const slide = parseInt(dot.dataset.panel, 10);
     carousel.querySelectorAll('.carousel-panel').forEach(p => {
       p.hidden = parseInt(p.dataset.panel, 10) !== slide;
     });
-    const labels = ['Overall', ...Array.from({ length: count - 1 }, (_, i) => `Round ${i + 1}`)];
-    carousel.querySelector('.carousel-label').textContent = labels[slide];
+    dot.closest('.carousel-dots').querySelectorAll('.carousel-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === slide);
+    });
     carousel.dataset.slide = slide;
   });
 }
