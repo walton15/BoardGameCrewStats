@@ -1387,6 +1387,104 @@ footer {
 }
 .btn-add-round:hover { color: var(--gold); border-color: rgba(201,185,122,0.5); }
 
+/* ── Team game (admin form) ──────────────────────────────────────────────────── */
+
+.team-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: 'Cinzel', serif;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--gold);
+  cursor: pointer;
+  user-select: none;
+  margin-bottom: 1.1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(201,185,122,0.12);
+}
+.team-toggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--gold);
+}
+
+.team-select {
+  width: 110px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: 'Cinzel', serif;
+  font-size: 0.82rem;
+  padding: 0.5rem;
+  min-height: 44px;
+  transition: border-color 0.2s;
+}
+.team-select:focus { outline: none; border-color: var(--gold); }
+.team-select:disabled { opacity: 0.3; }
+
+.guest-team-select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: 'Cinzel', serif;
+  font-size: 0.82rem;
+  padding: 0.5rem;
+  min-height: 44px;
+  flex-shrink: 0;
+  transition: border-color 0.2s;
+}
+.guest-team-select:focus { outline: none; border-color: var(--gold); }
+
+.team-standings-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.team-standing-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  background: rgba(201,185,122,0.05);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.team-standing-label {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.team-place-select {
+  width: 100px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  padding: 0.45rem;
+  min-height: 40px;
+  transition: border-color 0.2s;
+}
+.team-place-select:focus { outline: none; border-color: var(--gold); }
+
+.team-standings-empty {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
 /* ── Multi-round session cards (main page) ───────────────────────────────────── */
 
 .session-rounds-btn {
@@ -1452,3 +1550,37 @@ footer {
   border-top: 1px solid rgba(201,185,122,0.1);
 }
 .session-round-header:first-child { border-top: 1px solid rgba(201,185,122,0.15); margin-top: 0.25rem; }
+
+/* Team game indicators on session cards */
+.session-team-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-family: 'Cinzel', serif;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  border: 1px solid rgba(91,155,213,0.45);
+  color: var(--info);
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.team-chip {
+  display: inline-block;
+  font-family: 'Cinzel', serif;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.08rem 0.32rem;
+  border-radius: 3px;
+  border: 1px solid currentColor;
+  flex-shrink: 0;
+}
+.team-chip-1 { color: #5b9bd5; }
+.team-chip-2 { color: #4caf82; }
+.team-chip-3 { color: #e8a95c; }
+.team-chip-4 { color: #b87fd0; }
+.team-chip-5 { color: #d96a6a; }

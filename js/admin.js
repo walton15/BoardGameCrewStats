@@ -159,6 +159,21 @@ function populateGameDatalist() {
 
 // ── Round tabs ────────────────────────────────────────────────────────────────
 
+function ordinal(n) {
+  const s = ['th', 'st', 'nd', 'rd'], v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+function teamOptionsHtml(maxTeams) {
+  let html = '<option value="">— Team —</option>';
+  for (let i = 1; i <= maxTeams; i++) html += `<option value="${i}">Team ${i}</option>`;
+  return html;
+}
+
+function maxTeamCount() {
+  return Math.max(2, currentData?.players?.length || defaultPlayers().length);
+}
+
 function buildRoundPanel(roundIdx, players) {
   const panel = document.createElement('div');
   panel.className       = 'round-panel';
@@ -167,10 +182,18 @@ function buildRoundPanel(roundIdx, players) {
   const rowsId    = `player-rows-${roundIdx}`;
   const guestsId  = `guest-entries-${roundIdx}`;
   const addGuestId = `btn-add-guest-${roundIdx}`;
+  const maxTeams   = Math.max(2, players.length);
 
   panel.innerHTML = `
+    <label class="team-toggle">
+      <input type="checkbox" class="team-game-check"> Team game
+    </label>
     <div class="round-section-label">Player Placements</div>
     <div id="${rowsId}"></div>
+    <div class="team-standings" hidden>
+      <div class="round-section-label" style="margin-top:1.25rem;">Team Finish Order</div>
+      <div class="team-standings-rows"></div>
+    </div>
     <div class="round-section-label" style="margin-top:1.25rem;">Guests <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></div>
     <p style="font-size:0.82rem;color:var(--muted);margin-bottom:0.75rem;font-style:italic;">
       Guests are shown in sessions but excluded from overall rankings.
@@ -187,6 +210,7 @@ function buildRoundPanel(roundIdx, players) {
         ${p.name}
       </span>
       <input type="number" class="place-input" min="1" max="20" placeholder="#" aria-label="${p.name} placement">
+      <select class="team-select" hidden aria-label="${p.name} team">${teamOptionsHtml(maxTeams)}</select>
       <label class="absent-label">
         <input type="checkbox" class="absent-check" aria-label="${p.name} absent"> Absent
       </label>
@@ -195,10 +219,22 @@ function buildRoundPanel(roundIdx, players) {
 
   rowsContainer.querySelectorAll('.absent-check').forEach(cb => {
     cb.addEventListener('change', () => {
-      const input = cb.closest('.player-placement-row').querySelector('.place-input');
-      input.disabled = cb.checked;
-      if (cb.checked) input.value = '';
+      const row    = cb.closest('.player-placement-row');
+      const input  = row.querySelector('.place-input');
+      const select = row.querySelector('.team-select');
+      input.disabled  = cb.checked;
+      select.disabled = cb.checked;
+      if (cb.checked) { input.value = ''; select.value = ''; }
+      rebuildTeamStandings(panel);
     });
+  });
+
+  rowsContainer.querySelectorAll('.team-select').forEach(sel => {
+    sel.addEventListener('change', () => rebuildTeamStandings(panel));
+  });
+
+  panel.querySelector('.team-game-check').addEventListener('change', e => {
+    applyTeamMode(panel, e.target.checked);
   });
 
   panel.querySelector(`#${addGuestId}`).addEventListener('click', () => addGuestToRound(roundIdx));
@@ -207,17 +243,138 @@ function buildRoundPanel(roundIdx, players) {
 }
 
 function addGuestToRound(roundIdx) {
-  const id  = ++guestCount;
+  const id        = ++guestCount;
+  const container = document.getElementById(`guest-entries-${roundIdx}`);
+  const panel     = container.closest('.round-panel');
+  const isTeam    = panel.querySelector('.team-game-check').checked;
   const row = document.createElement('div');
   row.className = 'guest-entry';
   row.dataset.guestId = id;
   row.innerHTML = `
     <input type="text"   class="guest-name-input"  placeholder="Guest name" aria-label="Guest name">
-    <input type="number" class="guest-place-input" min="1" max="20" placeholder="#" aria-label="Guest placement">
+    <input type="number" class="guest-place-input" min="1" max="20" placeholder="#" aria-label="Guest placement"${isTeam ? ' hidden' : ''}>
+    <select class="guest-team-select"${isTeam ? '' : ' hidden'} aria-label="Guest team">${teamOptionsHtml(maxTeamCount())}</select>
     <button type="button" class="btn-remove-guest" aria-label="Remove guest">✕</button>
   `;
-  row.querySelector('.btn-remove-guest').addEventListener('click', () => row.remove());
-  document.getElementById(`guest-entries-${roundIdx}`).appendChild(row);
+  row.querySelector('.btn-remove-guest').addEventListener('click', () => { row.remove(); rebuildTeamStandings(panel); });
+  row.querySelector('.guest-team-select').addEventListener('change', () => rebuildTeamStandings(panel));
+  container.appendChild(row);
+  rebuildTeamStandings(panel);
+}
+
+function applyTeamMode(panel, isTeam) {
+  panel.querySelectorAll('.player-placement-row').forEach(row => {
+    const absent = row.querySelector('.absent-check').checked;
+    row.querySelector('.place-input').hidden = isTeam;
+    const select = row.querySelector('.team-select');
+    select.hidden   = !isTeam;
+    select.disabled = absent;
+  });
+  panel.querySelectorAll('.guest-entry').forEach(row => {
+    row.querySelector('.guest-place-input').hidden = isTeam;
+    const gsel = row.querySelector('.guest-team-select');
+    if (gsel) gsel.hidden = !isTeam;
+  });
+  panel.querySelector('.team-standings').hidden = !isTeam;
+  if (isTeam) rebuildTeamStandings(panel);
+}
+
+// Lists each team that has members and lets the user pick its finish order.
+function rebuildTeamStandings(panel) {
+  if (!panel.querySelector('.team-game-check').checked) return;
+  const container = panel.querySelector('.team-standings-rows');
+
+  // Preserve current finish-order selections across rebuilds
+  const prev = {};
+  container.querySelectorAll('.team-standing-row').forEach(r => {
+    prev[r.dataset.team] = r.querySelector('.team-place-select').value;
+  });
+
+  const used = new Set();
+  panel.querySelectorAll('.player-placement-row').forEach(row => {
+    if (row.querySelector('.absent-check').checked) return;
+    const v = row.querySelector('.team-select').value;
+    if (v) used.add(v);
+  });
+  panel.querySelectorAll('.guest-team-select').forEach(sel => {
+    if (sel.value) used.add(sel.value);
+  });
+
+  const teams = [...used].sort((a, b) => Number(a) - Number(b));
+  if (!teams.length) {
+    container.innerHTML = '<p class="team-standings-empty">Assign players to teams to set the finish order.</p>';
+    return;
+  }
+
+  const placeOpts = teams.map((_, i) => `<option value="${i + 1}">${ordinal(i + 1)}</option>`).join('');
+  container.innerHTML = teams.map(t => `
+    <div class="team-standing-row" data-team="${t}">
+      <span class="team-standing-label">Team ${t}</span>
+      <select class="team-place-select" aria-label="Team ${t} finish place">${placeOpts}</select>
+    </div>
+  `).join('');
+
+  container.querySelectorAll('.team-standing-row').forEach((r, i) => {
+    const want = prev[r.dataset.team];
+    r.querySelector('.team-place-select').value =
+      (want && Number(want) <= teams.length) ? want : String(i + 1);
+  });
+}
+
+// Reads team assignments + finish order from a panel and derives shared placements.
+// Teammates share a place; the next team's place jumps by the prior team's size
+// (a team of 3 in 1st → place 1; the next team starts at place 4).
+function buildTeamRound(panel) {
+  const teamMap = new Map(); // teamNum → { playerIds, guestNames }
+  const ensure  = num => {
+    if (!teamMap.has(num)) teamMap.set(num, { playerIds: [], guestNames: [] });
+    return teamMap.get(num);
+  };
+
+  panel.querySelectorAll('.player-placement-row').forEach(row => {
+    if (row.querySelector('.absent-check').checked) return;
+    const t = row.querySelector('.team-select').value;
+    if (t) ensure(t).playerIds.push(row.dataset.playerId);
+  });
+  panel.querySelectorAll('.guest-entry').forEach(row => {
+    const name = row.querySelector('.guest-name-input').value.trim();
+    const t    = row.querySelector('.guest-team-select')?.value;
+    if (name && t) ensure(t).guestNames.push(name);
+  });
+
+  const rankByTeam = {};
+  panel.querySelectorAll('.team-standing-row').forEach(r => {
+    rankByTeam[r.dataset.team] = parseInt(r.querySelector('.team-place-select').value, 10) || 1;
+  });
+
+  const rawTeams = [...teamMap.entries()]
+    .map(([num, m]) => ({ rank: rankByTeam[num] || 1, ...m }))
+    .sort((a, b) => a.rank - b.rank);
+
+  const teams      = [];
+  const placements = [];
+  const guests     = [];
+  let cumulative   = 0;
+  let i = 0;
+  while (i < rawTeams.length) {
+    const curRank = rawTeams[i].rank;
+    const group   = [];
+    let groupSize = 0;
+    while (i < rawTeams.length && rawTeams[i].rank === curRank) {
+      group.push(rawTeams[i]);
+      groupSize += rawTeams[i].playerIds.length + rawTeams[i].guestNames.length;
+      i++;
+    }
+    const place = cumulative + 1;
+    group.forEach(t => {
+      t.playerIds.forEach(pid => placements.push({ playerId: pid, place }));
+      t.guestNames.forEach(name => guests.push({ name, place }));
+      teams.push({ place, playerIds: t.playerIds, guestNames: t.guestNames });
+    });
+    cumulative += groupSize;
+  }
+
+  return { isTeam: true, teams, placements, guests };
 }
 
 function updateTabCloseVisibility() {
@@ -311,31 +468,84 @@ function populateEditForm() {
     const panels = document.querySelectorAll('#round-panels .round-panel');
     const panel  = panels[panels.length - 1];
 
-    panel.querySelectorAll('.player-placement-row').forEach(row => {
-      const placement   = round.placements.find(p => p.playerId === row.dataset.playerId);
-      const placeInput  = row.querySelector('.place-input');
-      const absentCheck = row.querySelector('.absent-check');
-      if (placement) {
-        placeInput.value    = placement.place;
-        absentCheck.checked = false;
-        placeInput.disabled = false;
-      } else {
-        absentCheck.checked = true;
-        placeInput.disabled = true;
-        placeInput.value    = '';
-      }
-    });
+    if (round.isTeam && Array.isArray(round.teams)) {
+      populateTeamRound(panel, round, idx);
+    } else {
+      panel.querySelectorAll('.player-placement-row').forEach(row => {
+        const placement   = round.placements.find(p => p.playerId === row.dataset.playerId);
+        const placeInput  = row.querySelector('.place-input');
+        const absentCheck = row.querySelector('.absent-check');
+        if (placement) {
+          placeInput.value    = placement.place;
+          absentCheck.checked = false;
+          placeInput.disabled = false;
+        } else {
+          absentCheck.checked = true;
+          placeInput.disabled = true;
+          placeInput.value    = '';
+        }
+      });
 
-    (round.guests || []).forEach(g => {
-      addGuestToRound(idx);
-      const guestRows = document.querySelectorAll(`#guest-entries-${idx} .guest-entry`);
-      const lastRow   = guestRows[guestRows.length - 1];
-      lastRow.querySelector('.guest-name-input').value  = g.name;
-      lastRow.querySelector('.guest-place-input').value = g.place;
-    });
+      (round.guests || []).forEach(g => {
+        addGuestToRound(idx);
+        const guestRows = document.querySelectorAll(`#guest-entries-${idx} .guest-entry`);
+        const lastRow   = guestRows[guestRows.length - 1];
+        lastRow.querySelector('.guest-name-input').value  = g.name;
+        lastRow.querySelector('.guest-place-input').value = g.place;
+      });
+    }
   });
 
   switchTab(0);
+}
+
+function populateTeamRound(panel, round, idx) {
+  panel.querySelector('.team-game-check').checked = true;
+  applyTeamMode(panel, true);
+
+  // Assign a stable team number (1, 2, 3…) per stored team, ordered by finish place.
+  const sortedTeams    = [...round.teams].sort((a, b) => a.place - b.place);
+  const distinctPlaces = [...new Set(sortedTeams.map(t => t.place))].sort((a, b) => a - b);
+  const playerTeamNum  = {};
+  const guestTeamNum   = {};
+  const teamNumRank    = {};
+  sortedTeams.forEach((t, i) => {
+    const num = i + 1;
+    teamNumRank[num] = distinctPlaces.indexOf(t.place) + 1;
+    (t.playerIds  || []).forEach(pid  => { playerTeamNum[pid]  = num; });
+    (t.guestNames || []).forEach(name => { guestTeamNum[name] = num; });
+  });
+
+  panel.querySelectorAll('.player-placement-row').forEach(row => {
+    const num         = playerTeamNum[row.dataset.playerId];
+    const absentCheck = row.querySelector('.absent-check');
+    const select      = row.querySelector('.team-select');
+    if (num) {
+      absentCheck.checked = false;
+      select.disabled     = false;
+      select.value        = String(num);
+    } else {
+      absentCheck.checked = true;
+      select.disabled     = true;
+      select.value        = '';
+      row.querySelector('.place-input').disabled = true;
+    }
+  });
+
+  (round.guests || []).forEach(g => {
+    addGuestToRound(idx);
+    const guestRows = document.querySelectorAll(`#guest-entries-${idx} .guest-entry`);
+    const lastRow   = guestRows[guestRows.length - 1];
+    lastRow.querySelector('.guest-name-input').value = g.name;
+    const gsel = lastRow.querySelector('.guest-team-select');
+    if (gsel && guestTeamNum[g.name]) gsel.value = String(guestTeamNum[g.name]);
+  });
+
+  rebuildTeamStandings(panel);
+  panel.querySelectorAll('.team-standing-row').forEach(r => {
+    const rank = teamNumRank[r.dataset.team];
+    if (rank) r.querySelector('.team-place-select').value = String(rank);
+  });
 }
 
 // ── Status ────────────────────────────────────────────────────────────────────
@@ -401,22 +611,26 @@ async function handleSubmit(e) {
   }
 
   const rounds = [];
-  document.querySelectorAll('#round-panels .round-panel').forEach((panel, idx) => {
-    const placements = [];
-    panel.querySelectorAll('.player-placement-row').forEach(row => {
-      if (row.querySelector('.absent-check').checked) return;
-      const place = parseInt(row.querySelector('.place-input').value, 10);
-      if (!isNaN(place) && place >= 1) placements.push({ playerId: row.dataset.playerId, place });
-    });
+  document.querySelectorAll('#round-panels .round-panel').forEach(panel => {
+    if (panel.querySelector('.team-game-check').checked) {
+      rounds.push(buildTeamRound(panel));
+    } else {
+      const placements = [];
+      panel.querySelectorAll('.player-placement-row').forEach(row => {
+        if (row.querySelector('.absent-check').checked) return;
+        const place = parseInt(row.querySelector('.place-input').value, 10);
+        if (!isNaN(place) && place >= 1) placements.push({ playerId: row.dataset.playerId, place });
+      });
 
-    const guests = [];
-    panel.querySelectorAll('.guest-entry').forEach(row => {
-      const name  = row.querySelector('.guest-name-input').value.trim();
-      const place = parseInt(row.querySelector('.guest-place-input').value, 10);
-      if (name && !isNaN(place) && place >= 1) guests.push({ name, place });
-    });
+      const guests = [];
+      panel.querySelectorAll('.guest-entry').forEach(row => {
+        const name  = row.querySelector('.guest-name-input').value.trim();
+        const place = parseInt(row.querySelector('.guest-place-input').value, 10);
+        if (name && !isNaN(place) && place >= 1) guests.push({ name, place });
+      });
 
-    rounds.push({ placements, guests });
+      rounds.push({ placements, guests });
+    }
   });
 
   if (!rounds.some(r => r.placements.length > 0)) {

@@ -27,7 +27,58 @@ function getRounds(s) {
   return s.rounds ?? [{ placements: s.placements || [], guests: s.guests || [] }];
 }
 
+// Maps each participant (playerId, or `guest:Name`) to a 1-based team index,
+// ordered by team finish place. Returns null for non-team rounds.
+function teamIndexMap(round) {
+  if (!round.isTeam || !Array.isArray(round.teams)) return null;
+  const sorted = [...round.teams].sort((a, b) => a.place - b.place);
+  const map = new Map();
+  sorted.forEach((t, i) => {
+    (t.playerIds  || []).forEach(pid  => map.set(pid, i + 1));
+    (t.guestNames || []).forEach(name => map.set(`guest:${name}`, i + 1));
+  });
+  return map;
+}
+
+function teamChip(idx) {
+  return idx ? `<span class="team-chip team-chip-${((idx - 1) % 5) + 1}">T${idx}</span>` : '';
+}
+
+// For multi-round sessions, compute each participant's avg placement across rounds,
+// then rank them — so the session contributes a rank (1, 2, 3…) to the overall average,
+// exactly like a single-round session, rather than a raw float.
+function calcSessionRanks(sessions) {
+  const cache = new Map(); // sessionId → Map(participantKey → rank)
+  for (const s of sessions) {
+    const rounds = getRounds(s);
+    if (rounds.length <= 1) continue;
+    const places = new Map();
+    for (const r of rounds) {
+      for (const p of r.placements) {
+        if (!places.has(p.playerId)) places.set(p.playerId, []);
+        places.get(p.playerId).push(p.place);
+      }
+      for (const g of (r.guests || [])) {
+        const key = `guest:${g.name}`;
+        if (!places.has(key)) places.set(key, []);
+        places.get(key).push(g.place);
+      }
+    }
+    const avgs = [...places.entries()].map(([id, ps]) => ({
+      id, avg: ps.reduce((a, b) => a + b, 0) / ps.length,
+    }));
+    const rankMap = new Map();
+    for (const { id, avg } of avgs) {
+      rankMap.set(id, avgs.filter(x => x.avg < avg).length + 1);
+    }
+    cache.set(s.id, rankMap);
+  }
+  return cache;
+}
+
 function calcStats(players, sessions) {
+  const sessionRanks = calcSessionRanks(sessions);
+
   const ranked = players.map(player => {
     let firstCount  = 0;
     let lastCount   = 0;
@@ -35,22 +86,26 @@ function calcStats(players, sessions) {
 
     sessions.forEach(s => {
       const rounds = getRounds(s);
-      const roundPlaces = [];
 
-      rounds.forEach(round => {
+      if (rounds.length > 1) {
+        const rankMap = sessionRanks.get(s.id);
+        const rank = rankMap?.get(player.id);
+        if (rank === undefined) return;
+        sessionAvgs.push(rank);
+        if (rank === 1) firstCount++;
+        if (rank === Math.max(...rankMap.values())) lastCount++;
+      } else {
+        const round = rounds[0];
         const found = round.placements.find(p => p.playerId === player.id);
         if (!found) return;
-        roundPlaces.push(found.place);
+        sessionAvgs.push(found.place);
         if (found.place === 1) firstCount++;
-        const worstInRound = Math.max(
+        const worst = Math.max(
           ...round.placements.map(p => p.place),
           ...(round.guests || []).map(g => g.place),
         );
-        if (found.place === worstInRound) lastCount++;
-      });
-
-      if (!roundPlaces.length) return;
-      sessionAvgs.push(roundPlaces.reduce((a, b) => a + b, 0) / roundPlaces.length);
+        if (found.place === worst) lastCount++;
+      }
     });
 
     const avg = sessionAvgs.length
@@ -503,6 +558,11 @@ function renderSessions(sessions, players) {
       ? `<button type="button" class="session-rounds-btn" data-session-id="${s.id}" aria-expanded="false" aria-label="Show ${rounds.length} rounds">${rounds.length}</button>`
       : '';
 
+    const hasTeam       = rounds.some(r => r.isTeam);
+    const teamBadgeHtml = hasTeam ? '<span class="session-team-badge">🤝 Team</span>' : '';
+    // Team chips are only unambiguous for single-round games (membership can vary per round)
+    const summaryTeamMap = (!isMultiRound && rounds[0].isTeam) ? teamIndexMap(rounds[0]) : null;
+
     // Compute per-player average placements across all rounds
     const allPlayerIds  = new Set(rounds.flatMap(r => r.placements.map(p => p.playerId)));
     const allGuestNames = [...new Set(rounds.flatMap(r => (r.guests || []).map(g => g.name)))];
@@ -511,12 +571,12 @@ function renderSessions(sessions, players) {
       ...[...allPlayerIds].map(pid => {
         const places = rounds.flatMap(r => r.placements.filter(p => p.playerId === pid).map(p => p.place));
         const avg = places.reduce((a, b) => a + b, 0) / places.length;
-        return { name: pMap[pid]?.name ?? pid, color: pMap[pid]?.color ?? '#888', avg, isGuest: false };
+        return { key: pid, name: pMap[pid]?.name ?? pid, color: pMap[pid]?.color ?? '#888', avg, isGuest: false };
       }),
       ...allGuestNames.map(name => {
         const places = rounds.flatMap(r => (r.guests || []).filter(g => g.name === name).map(g => g.place));
         const avg = places.reduce((a, b) => a + b, 0) / places.length;
-        return { name, color: null, avg, isGuest: true };
+        return { key: `guest:${name}`, name, color: null, avg, isGuest: true };
       }),
     ].sort((a, b) => a.avg - b.avg || (a.isGuest ? 1 : -1));
 
@@ -534,12 +594,14 @@ function renderSessions(sessions, players) {
 
     const summaryRows = summaryParticipants.map(p => {
       const placeDisplay = placeIcon(Math.round(p.avg));
+      const chip = summaryTeamMap ? teamChip(summaryTeamMap.get(p.key)) : '';
       return `
         <tr class="${p.isGuest ? 'guest-row' : ''}">
           <td class="td-place">${placeDisplay}</td>
           <td class="td-name">
             ${!p.isGuest ? `<span class="player-dot" style="background:${p.color}"></span>` : ''}
             ${p.name}
+            ${chip}
             ${p.isGuest ? '<span class="guest-badge">Guest</span>' : ''}
           </td>
         </tr>
@@ -550,27 +612,34 @@ function renderSessions(sessions, players) {
     const roundDetailHtml = isMultiRound ? `
       <div class="session-rounds-detail" id="rounds-detail-${s.id}" hidden>
         ${rounds.map((round, idx) => {
+          const roundTeamMap = teamIndexMap(round);
           const roundParticipants = [
             ...round.placements.map(p => ({
+              key: p.playerId,
               name: pMap[p.playerId]?.name ?? p.playerId,
               place: p.place, color: pMap[p.playerId]?.color ?? '#888', isGuest: false,
             })),
-            ...(round.guests || []).map(g => ({ name: g.name, place: g.place, color: null, isGuest: true })),
+            ...(round.guests || []).map(g => ({ key: `guest:${g.name}`, name: g.name, place: g.place, color: null, isGuest: true })),
           ].sort((a, b) => a.place - b.place || (a.isGuest ? 1 : -1));
 
-          const roundRows = roundParticipants.map(p => `
+          const roundRows = roundParticipants.map(p => {
+            const chip = roundTeamMap ? teamChip(roundTeamMap.get(p.key)) : '';
+            return `
             <tr class="${p.isGuest ? 'guest-row' : ''}">
               <td class="td-place">${placeIcon(p.place)}</td>
               <td class="td-name">
                 ${!p.isGuest ? `<span class="player-dot" style="background:${p.color}"></span>` : ''}
                 ${p.name}
+                ${chip}
                 ${p.isGuest ? '<span class="guest-badge">Guest</span>' : ''}
               </td>
             </tr>
-          `).join('');
+          `;
+          }).join('');
 
+          const headerLabel = round.isTeam ? `Round ${idx + 1} · Teams` : `Round ${idx + 1}`;
           return `
-            <div class="session-round-header">Round ${idx + 1}</div>
+            <div class="session-round-header">${headerLabel}</div>
             <table class="session-table"><tbody>${roundRows}</tbody></table>
           `;
         }).join('')}
@@ -581,7 +650,7 @@ function renderSessions(sessions, players) {
       <div class="session-card"${cardStyle}>
         <div class="session-head">
           <div>
-            <div class="session-game">${thumbHtml} ${s.game}</div>
+            <div class="session-game">${thumbHtml} ${s.game} ${teamBadgeHtml}</div>
             <div class="session-date">${dateStr}</div>
           </div>
           <div style="display:flex;align-items:center;gap:0.5rem;">
