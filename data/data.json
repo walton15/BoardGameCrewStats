@@ -413,15 +413,29 @@
       "game": "Codenames",
       "rounds": [
         {
+          "isTeam": true,
+          "teams": [
+            {
+              "place": 1,
+              "playerIds": [
+                "walton",
+                "jack"
+              ],
+              "guestNames": [
+                "Carl"
+              ]
+            },
+            {
+              "place": 4,
+              "playerIds": [
+                "taylor",
+                "autumn",
+                "maddy"
+              ],
+              "guestNames": []
+            }
+          ],
           "placements": [
-            {
-              "playerId": "taylor",
-              "place": 4
-            },
-            {
-              "playerId": "autumn",
-              "place": 4
-            },
             {
               "playerId": "walton",
               "place": 1
@@ -429,6 +443,14 @@
             {
               "playerId": "jack",
               "place": 1
+            },
+            {
+              "playerId": "taylor",
+              "place": 4
+            },
+            {
+              "playerId": "autumn",
+              "place": 4
             },
             {
               "playerId": "maddy",
@@ -443,15 +465,29 @@
           ]
         },
         {
+          "isTeam": true,
+          "teams": [
+            {
+              "place": 1,
+              "playerIds": [
+                "walton",
+                "jack"
+              ],
+              "guestNames": [
+                "Carl"
+              ]
+            },
+            {
+              "place": 4,
+              "playerIds": [
+                "taylor",
+                "autumn",
+                "maddy"
+              ],
+              "guestNames": []
+            }
+          ],
           "placements": [
-            {
-              "playerId": "taylor",
-              "place": 4
-            },
-            {
-              "playerId": "autumn",
-              "place": 4
-            },
             {
               "playerId": "walton",
               "place": 1
@@ -459,6 +495,14 @@
             {
               "playerId": "jack",
               "place": 1
+            },
+            {
+              "playerId": "taylor",
+              "place": 4
+            },
+            {
+              "playerId": "autumn",
+              "place": 4
             },
             {
               "playerId": "maddy",
