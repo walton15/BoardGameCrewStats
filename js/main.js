@@ -649,7 +649,7 @@ function renderSessions(sessions, players) {
     }
 
     const headRight = isMultiRound
-      ? `<div class="session-head-right">${carouselDotsHtml}<a href="session.html?edit=${s.id}" class="btn-edit-session">Edit</a></div>`
+      ? `<div class="session-head-right"><a href="session.html?edit=${s.id}" class="btn-edit-session">Edit</a><div class="carousel-nav-row"><span class="carousel-label">Overall</span>${carouselDotsHtml}</div></div>`
       : `<a href="session.html?edit=${s.id}" class="btn-edit-session">Edit</a>`;
 
     const cardHtml = `
@@ -678,9 +678,13 @@ function renderSessions(sessions, players) {
     carousel.querySelectorAll('.carousel-panel').forEach(p => {
       p.hidden = parseInt(p.dataset.panel, 10) !== slide;
     });
-    dot.closest('.carousel-dots').querySelectorAll('.carousel-dot').forEach((d, i) => {
+    const dotsEl = dot.closest('.carousel-dots');
+    dotsEl.querySelectorAll('.carousel-dot').forEach((d, i) => {
       d.classList.toggle('active', i === slide);
     });
+    const count = parseInt(carousel.dataset.count, 10);
+    const labels = ['Overall', ...Array.from({ length: count - 1 }, (_, i) => `Round ${i + 1}`)];
+    dotsEl.closest('.carousel-nav-row').querySelector('.carousel-label').textContent = labels[slide];
     carousel.dataset.slide = slide;
   });
 }

@@ -1491,7 +1491,21 @@ footer {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 0.35rem;
+  gap: 0.3rem;
+}
+
+.carousel-nav-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.carousel-label {
+  font-size: 0.62rem;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 .carousel-dots {
