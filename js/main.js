@@ -359,13 +359,14 @@ function renderChart(ranked, sessions) {
     return `${s.game} (${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`;
   });
 
+  const sessionRanks = calcSessionRanks(sorted);
+
   const datasets = ranked.map(p => ({
     label: p.name,
     data: sorted.map(s => {
       const rounds = getRounds(s);
-      const places = rounds.flatMap(r => r.placements.filter(pl => pl.playerId === p.id).map(pl => pl.place));
-      if (!places.length) return null;
-      return +(places.reduce((a, b) => a + b, 0) / places.length).toFixed(2);
+      if (rounds.length > 1) return sessionRanks.get(s.id)?.get(p.id) ?? null;
+      return rounds[0].placements.find(pl => pl.playerId === p.id)?.place ?? null;
     }),
     borderColor: p.color,
     backgroundColor: p.color + '22',
@@ -521,7 +522,7 @@ function renderChart(ranked, sessions) {
           bodyColor: '#f0e6d3',
           callbacks: {
             label: ctx => ctx.raw !== null
-              ? ` ${ctx.dataset.label}: ${ctx.raw % 1 === 0 ? `#${ctx.raw}` : `avg ${ctx.raw}`} place`
+              ? ` ${ctx.dataset.label}: #${ctx.raw} place`
               : ` ${ctx.dataset.label}: absent`,
           },
         },
