@@ -37,19 +37,43 @@ function hideBggDropdown() {
   document.getElementById('bgg-results').hidden = true;
 }
 
+// Lower is better: exact match, then prefix, then word match, then anything else.
+// Expansions, fan maps and promos are pushed below base games.
+function scoreBGGResult({ name, type }, query) {
+  const n = name.toLowerCase();
+  const q = query.toLowerCase();
+  let score;
+  if (n === q)                                   score = 0;
+  else if (n.startsWith(q + ':') || n.startsWith(q + ' ')) score = 1;
+  else if (n.startsWith(q))                      score = 2;
+  else if (new RegExp(`\\b${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`).test(n)) score = 3;
+  else                                           score = 4;
+  if (type === 'boardgameexpansion' || /expansion|promo|\bdemo\b/.test(n)) score += 5;
+  return score;
+}
+
 async function searchBGG(query) {
   const dropdown = document.getElementById('bgg-results');
   try {
     const xml = await bggProxy(
       `https://boardgamegeek.com/xmlapi2/search?query=${encodeURIComponent(query)}&type=boardgame`
     );
-    const items = [...xml.querySelectorAll('item')].slice(0, 10);
+    // BGG returns every match alphabetically, so rank by relevance before trimming
+    const seen  = new Set();
+    const items = [...xml.querySelectorAll('item')]
+      .map(item => ({
+        id:   item.getAttribute('id'),
+        type: item.getAttribute('type'),
+        name: (item.querySelector('name[type="primary"]') ?? item.querySelector('name'))?.getAttribute('value') ?? '?',
+        year: item.querySelector('yearpublished')?.getAttribute('value') ?? '',
+      }))
+      .filter(r => !seen.has(r.id) && seen.add(r.id))
+      .map(r => ({ ...r, score: scoreBGGResult(r, query) }))
+      .sort((a, b) => a.score - b.score || a.name.length - b.name.length || (a.year || 9999) - (b.year || 9999))
+      .slice(0, 10);
     if (!items.length) { dropdown.hidden = true; return; }
 
-    dropdown.innerHTML = items.map(item => {
-      const id   = item.getAttribute('id');
-      const name = item.querySelector('name[type="primary"]')?.getAttribute('value') ?? '?';
-      const year = item.querySelector('yearpublished')?.getAttribute('value') ?? '';
+    dropdown.innerHTML = items.map(({ id, name, year }) => {
       return `
         <div class="bgg-result" data-id="${id}" data-name="${name.replace(/"/g, '&quot;')}">
           <span class="bgg-result-name">${name}</span>
