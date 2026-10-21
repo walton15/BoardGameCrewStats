@@ -817,6 +817,13 @@
           "teams": [
             {
               "place": 1,
+              "playerIds": [],
+              "guestNames": [
+                "Dracula, The Invisible Man, The Wolf Man"
+              ]
+            },
+            {
+              "place": 2,
               "playerIds": [
                 "taylor",
                 "autumn",
@@ -825,41 +832,34 @@
                 "maddy"
               ],
               "guestNames": []
-            },
-            {
-              "place": 6,
-              "playerIds": [],
-              "guestNames": [
-                "Dracula, The Invisible Man, The Wolf Man"
-              ]
             }
           ],
           "placements": [
             {
               "playerId": "taylor",
-              "place": 1
+              "place": 2
             },
             {
               "playerId": "autumn",
-              "place": 1
+              "place": 2
             },
             {
               "playerId": "walton",
-              "place": 1
+              "place": 2
             },
             {
               "playerId": "jack",
-              "place": 1
+              "place": 2
             },
             {
               "playerId": "maddy",
-              "place": 1
+              "place": 2
             }
           ],
           "guests": [
             {
               "name": "Dracula, The Invisible Man, The Wolf Man",
-              "place": 6
+              "place": 1
             }
           ]
         }
