@@ -806,6 +806,76 @@
       ],
       "gameImage": "https://cf.geekdo-images.com/kdWYkW-7AqG63HhqPL6ekA__small/img/5G46jv8MFh_BfX67iMSouTMhKxc=/fit-in/200x150/filters:strip_icc()/pic8937637.jpg",
       "gameImageFull": "https://cf.geekdo-images.com/kdWYkW-7AqG63HhqPL6ekA__original/img/rWF8r4JXXCQQ7QhiWHhmT-rQ3Pc=/0x0/filters:format(jpeg)/pic8937637.jpg"
+    },
+    {
+      "id": 14,
+      "date": "2026-10-20",
+      "game": "Horrified",
+      "rounds": [
+        {
+          "isTeam": true,
+          "teams": [
+            {
+              "place": 1,
+              "playerIds": [],
+              "guestNames": [
+                "Dracula",
+                "The Invisible Man",
+                "The Wolf Man"
+              ]
+            },
+            {
+              "place": 4,
+              "playerIds": [
+                "taylor",
+                "autumn",
+                "walton",
+                "jack",
+                "maddy"
+              ],
+              "guestNames": []
+            }
+          ],
+          "placements": [
+            {
+              "playerId": "taylor",
+              "place": 4
+            },
+            {
+              "playerId": "autumn",
+              "place": 4
+            },
+            {
+              "playerId": "walton",
+              "place": 4
+            },
+            {
+              "playerId": "jack",
+              "place": 4
+            },
+            {
+              "playerId": "maddy",
+              "place": 4
+            }
+          ],
+          "guests": [
+            {
+              "name": "Dracula",
+              "place": 1
+            },
+            {
+              "name": "The Invisible Man",
+              "place": 1
+            },
+            {
+              "name": "The Wolf Man",
+              "place": 1
+            }
+          ]
+        }
+      ],
+      "gameImage": "https://cf.geekdo-images.com/SoClIcwjDo_iZs0idVikDw__small/img/YSf5Z99aBqAlNKaGBj_oGb1oKH4=/fit-in/200x150/filters:strip_icc()/pic4848330.jpg",
+      "gameImageFull": "https://cf.geekdo-images.com/SoClIcwjDo_iZs0idVikDw__original/img/TEprFkOM3G_u2HnUvh05WITeXbg=/0x0/filters:format(jpeg)/pic4848330.jpg"
     }
   ]
 }
